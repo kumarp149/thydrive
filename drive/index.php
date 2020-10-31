@@ -344,7 +344,7 @@ $up_url=($up_dir!=''&&$up_dir!='.')?'/'.rawurlencode($up_dir):'index.php';
         //console.log(_files.length+_dirs.length);
         idx.innerHTML='<div class="rounded gray" style="padding:5px 10px 5px 7px;color:#202020">' +
             '<p class="left">' +
-                '<label class="cont" style="margin-left: -4px;"><span><input type="checkbox"><span class="checkmark controlling"></span></span></label><?=$dir!=''?'&nbsp; (<a href="'.$up_url.'">Back</a>)':''?><br />' +
+                '<label class="cont" style="margin-left: -5px;"><span><input type="checkbox"><span class="checkmark controlling"></span></span></label><?=$dir!=''?'&nbsp; (<a href="'.$up_url.'">Back</a>)':''?><br />' +
             '</p>' +
             '<p class="right hide-for-mobiles">' +
                 'Sort: <span class="link hidename" onmousedown="return _srt(\'name\');" id="sort_name">Name</span>  <span class="link hidetype" onmousedown="return _srt(\'type\');" id="sort_type">Type</span> <span class="link hidesize" onmousedown="return _srt(\'size\');" id="sort_size">Size</span> <span class="link hidedate" onmousedown="return _srt(\'date\');" id="sort_date">Date</span>' +
