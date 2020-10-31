@@ -1,2 +1,0 @@
-1)For opening Excel: excel = New-Object -ComObject excel.application 
-2)For opening Word Document: 
