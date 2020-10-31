@@ -1,0 +1,3 @@
+1) In the root directory, a folder named "files" is created. This is where the bucket is mounted.
+2) For every new signup, a new folder will be created in the bucket. Since, the bucket is already mounted,
+   every folder created in the bucket exists in the webserver.

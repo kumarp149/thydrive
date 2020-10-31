@@ -1,0 +1,45 @@
+1) First user will be sent to the Email page
+2) If the user enters his emailid which has an account associated to it, he will be sent to the password page.
+   If the user enters his emailid which has no account associated to it, he will be displayed "No account" notification.
+   If the user wants to create an account, he can click "No account" button, then he will be sent to signup page.
+
+   a) The user enters his details following all the restrictions and clicks submit. Then, he will be sent to the email confirmation page.
+   b) In the email confirmation page, he should enter a code (which is valid only for 10 mins) sent to his emailid. Once the email is 
+      confirmed, he will be sent to encryption settings page.
+   c) In the encryption settings page, he will be given options to choose for the file encryption. He can manage his encryption key 
+      himself or else he can ask us to manage the encryption key. If he chooses the latter option, he will be sent an email containing 
+      his encryption key.
+   d) Once his account is succesfully created, a GCP Bucket will be created for him with a unique name. Whatever files he upload will
+      be stored in that bucket.
+      Also, a Rewrite rule will be added to .htaccess file. 
+3) If the user reloads the password page, he will be sent back to email page
+   If the user enters his correct password, he will sent to '/drive' page.
+
+4) In the '/drive' page user will see all the folders and files he created.
+
+5) Once he clicks on a file, he will be sent to a new tab with the link associated to that file.
+   Important: Since these files are stored in GCP Buckets with Public Access, '.htaccess' file is used to mask the original link.
+
+6) If the user manages his encryption key himself, he will show a prompt to enter his encryption key to view his file. If the 
+   encryption key entered is incorrect, he can view the document but the exact data will not be visible.
+
+
+File system:
+
+file = 
+{
+   'index.php' : 'Email entry',
+   'password1.php' : 'Password entry',
+   'create-account.php' : 'Signup page',
+   'confirm-account.php' : 'Email Id confirmation',
+   'drive' :
+   {
+      '.htaccess' : 'Rewriting URLs',
+      'files.php' : 'The main page',
+      'logout.php' : 'To process the logout'
+   }
+}
+
+.htaccess file in drive folder:
+
+1) Whenever a user succesfully creates an account, a new line correspoding to his user key will be added to .htaccess file.

@@ -1,0 +1,27 @@
+<form id="theForm">
+    <input type="file" id="fileField" >
+    <input type="button" value="Upload" onclick="upload(event)">
+
+
+</form>
+
+<script>
+function upload(event) {
+    console.log("Uploading...");
+
+    const fileField = document.getElementById("fileField");
+    const formData = new FormData();
+
+    formData.append('test', 'testValue');
+    formData.append('selectedFile', fileField.files[0]);
+
+    fetch('https://mathlearn.icu', {
+        method: 'PUT',
+        body: formData
+    })
+    .then((result) => {
+        console.log('Success:', result);
+    })
+    ;
+}
+</script>

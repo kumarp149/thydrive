@@ -1,0 +1,3 @@
+#RewriteEngine On
+#RewriteCond %{HTTP_COOKIE} !cookie_name=sruteeshkumarp@gmail.com; [NC]
+#RewriteRule ^ http://mathlearn.icu [NC,L]
