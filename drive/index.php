@@ -345,7 +345,7 @@ $up_url=($up_dir!=''&&$up_dir!='.')?'/'.rawurlencode($up_dir):'index.php';
         _tpg=Math.ceil((_files.length+_dirs.length)/_ppg);
         //console.log(_files.length+_dirs.length);
         idx.innerHTML='<div class="rounded gray" style="padding:5px 10px 5px 7px;color:#202020">' +
-            '<div class="row pb-2 float-left"><label class="cont" style="margin-left: 4px"><span><input type="checkbox" class="" /><span class="checkmark controlling"></span></span></label><span><div class="ui dropdown" style="margin-left: 15px;"><div style="" class="text"><strong>Actions</strong></div><i class="dropdown icon" style="margin-left: 5px;"></i><div class="menu"><div class="item"><span class="description">Ctrl+N</span><strong>Upload</strong></div><div class="item"><span class="description">Ctrl+D</span><strong>Delete</strong></div><div class="item"><strong>Rename</strong></div><div class="item"><i class="folder icon"></i><strong>Move to Folder</strong></div></div></div><?=$dir!=''?'&nbsp; (<a href="'.$up_url.'">Back</a>)':''?></span></div>' +
+            '<div class="row pb-2 float-left"><label class="cont" style="margin-left: 4px"><span><input type="checkbox" class="" /><span class="checkmark controlling"></span></span></label><span><div class="ui dropdown simple" style="margin-left: 15px;"><div style="" class="text"><strong>Actions</strong></div><i class="dropdown icon" style="margin-left: 5px;"></i><div class="menu"><div class="item"><span class="description">Ctrl+N</span><strong>Upload</strong></div><div class="item"><span class="description">Ctrl+D</span><strong>Delete</strong></div><div class="item"><strong>Rename</strong></div><div class="item"><i class="folder icon"></i><strong>Move to Folder</strong></div></div></div><?=$dir!=''?'&nbsp; (<a href="'.$up_url.'">Back</a>)':''?></span></div>' +
             '<div class="float-right hide-for-mobiles" style="">' +
                 'Sort: <span class="link hidename" onmousedown="return _srt(\'name\');" id="sort_name">Name</span>  <span class="link hidetype" onmousedown="return _srt(\'type\');" id="sort_type">Type</span> <span class="link hidesize" onmousedown="return _srt(\'size\');" id="sort_size">Size</span> <span class="link hidedate" onmousedown="return _srt(\'date\');" id="sort_date">Date</span>' +
             '</div>' +
@@ -528,49 +528,6 @@ $up_url=($up_dir!=''&&$up_dir!='.')?'/'.rawurlencode($up_dir):'index.php';
             <div id="idx"></div>
         </div>
       </span>
-      <div class="ui dropdown">
-  <div class="text">File</div>
-  <i class="dropdown icon"></i>
-  <div class="menu">
-    <div class="item">New</div>
-    <div class="item">
-      <span class="description">ctrl + o</span>
-      Open...
-    </div>
-    <div class="item">
-      <span class="description">ctrl + s</span>
-      Save as...
-    </div>
-    <div class="item">
-      <span class="description">ctrl + r</span>
-      Rename
-    </div>
-    <div class="item">Make a copy</div>
-    <div class="item">
-      <i class="folder icon"></i>
-      Move to folder
-    </div>
-    <div class="item">
-      <i class="trash icon"></i>
-      Move to trash
-    </div>
-    <div class="divider"></div>
-    <div class="item">Download As...</div>
-    <div class="item">
-      <i class="dropdown icon"></i>
-      Publish To Web
-      <div class="menu">
-        <div class="item">Google Docs</div>
-        <div class="item">Google Drive</div>
-        <div class="item">Dropbox</div>
-        <div class="item">Adobe Creative Cloud</div>
-        <div class="item">Private FTP</div>
-        <div class="item">Another Service...</div>
-      </div>
-    </div>
-    <div class="item">E-mail Collaborators</div>
-  </div>
-</div>
         <footer class="bg-white sticky-footer">
             <div class="container my-auto">
                 <div class="text-center my-auto copyright"><span>Copyright © ThyDrive 2020</span></div></br>
@@ -581,8 +538,6 @@ $up_url=($up_dir!=''&&$up_dir!='.')?'/'.rawurlencode($up_dir):'index.php';
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.js"></script>
     <script src="http://mathlearn.icu/assets/js/theme.js"></script>
-    <script src="/semantic/dist/semantic.min.js"></script>
-    <script src="/semantic/dist/semantic.js"></script>
     <script>
   $(document)
     .ready(function() {
