@@ -312,7 +312,7 @@ $up_url=($up_dir!=''&&$up_dir!='.')?'/'.rawurlencode($up_dir):'index.php';
         if(!idx)return;
         _tpg=Math.ceil((_files.length+_dirs.length)/_ppg);
         idx.innerHTML='<div class="rounded gray" style="padding:5px 10px 5px 7px;color:#202020">' +
-            '<div class="row pb-2 float-left"><label class="cont" style="margin-left: 4px"><span><input type="checkbox controlling" class="" /><span class="checkmark controlling"></span></span></label><span><div class="ui dropdown simple" style="margin-left: 15px;"><div style="" class="text"><strong>Actions</strong></div><i class="dropdown icon" style="margin-left: 5px;"></i><div class="menu"><div class="item action-file"><i class="upload icon"></i><strong>File Upload</strong></div><div class="item action-folder"><i class="folder icon"></i><strong>New Folder</strong></div><div class="item action-delete"><i class="trash alternate icon"></i><strong>Delete</strong></div><div class="item action-move"><i class="folder open icon"></i><strong>Move to Folder</strong></div><div class="item action-rename" style="display: none;"><i class="pen square icon"></i><strong>Rename</strong></div></div></div><?=$dir!=''?'&nbsp; (<a href="'.$up_url.'">Back</a>)':''?></span></div>' +
+            '<div class="row pb-2 float-left"><label class="cont" style="margin-left: 4px"><span><input type="checkbox" class="controlling" /><span class="checkmark"></span></span></label><span><div class="ui dropdown simple" style="margin-left: 15px;"><div style="" class="text"><strong>Actions</strong></div><i class="dropdown icon" style="margin-left: 5px;"></i><div class="menu"><div class="item action-file"><i class="upload icon"></i><strong>File Upload</strong></div><div class="item action-folder"><i class="folder icon"></i><strong>New Folder</strong></div><div class="item action-delete"><i class="trash alternate icon"></i><strong>Delete</strong></div><div class="item action-move"><i class="folder open icon"></i><strong>Move to Folder</strong></div><div class="item action-rename" style="display: none;"><i class="pen square icon"></i><strong>Rename</strong></div></div></div><?=$dir!=''?'&nbsp; (<a href="'.$up_url.'">Back</a>)':''?></span></div>' +
             '<div class="float-right hide-for-mobiles" style="">' +
                 'Sort: <span class="link hidename" onmousedown="return _srt(\'name\');" id="sort_name">Name</span>  <span class="link hidetype" onmousedown="return _srt(\'type\');" id="sort_type">Type</span> <span class="link hidesize" onmousedown="return _srt(\'size\');" id="sort_size">Size</span> <span class="link hidedate" onmousedown="return _srt(\'date\');" id="sort_date">Date</span>' +
             '</div>' +
@@ -335,14 +335,14 @@ $up_url=($up_dir!=''&&$up_dir!='.')?'/'.rawurlencode($up_dir):'index.php';
             {
               var last__dir_dot = f['name'].lastIndexOf(".");
             }
-            html+='<tr class="datarow" style="background-color:'+rc+'"><td class="firsttd"><label class="cont"><span><label>&nbsp;&nbsp;&nbsp;<img class="file-icon-class" src="'+f['icon']+'" alt="" /></label><input type="checkbox dircheck"><span class="checkmark"></span>&nbsp;&nbsp<a data-type="directory" class="navigation" href="'+f['url']+'"><span class="filenamespan">'+f['name']+'</span></a></label></span></td><td class="hide-download"><a></a></td><td class="center hide2" style="width:50px;">'+(f['dir']?'':_s(f['size']))+'</td><td class="center hide1" style="width:70px;">'+f['date']+'</td></tr>';
+            html+='<tr class="datarow" style="background-color:'+rc+'"><td class="firsttd"><label class="cont"><span><label>&nbsp;&nbsp;&nbsp;<img class="file-icon-class" src="'+f['icon']+'" alt="" /></label><input type="checkbox" class="dircheck"><span class="checkmark"></span>&nbsp;&nbsp<a data-type="directory" class="navigation" href="'+f['url']+'"><span class="filenamespan">'+f['name']+'</span></a></label></span></td><td class="hide-download"><a></a></td><td class="center hide2" style="width:50px;">'+(f['dir']?'':_s(f['size']))+'</td><td class="center hide1" style="width:70px;">'+f['date']+'</td></tr>';
             c = _dirs.length;
         }
         for(var i=c;i<b&&i<(_files.length+_dirs.length);++i)
         {
             var f=_cnt[i];var rc=j++&1?_c1:_c2;
             var file_name_length = f['name'].length;
-            html+='<tr class="datarow" style="background-color:'+rc+'"><td class="firsttd"><label class="cont"><span><label>&nbsp;&nbsp;&nbsp;<img class="file-icon-class" src="'+f['icon']+'" alt="" /></label><input type="checkbox filecheck"><span class="checkmark"></span>&nbsp;&nbsp<a data-type="file" class="navigation" href="'+f['url']+'"><span class="filenamespan">'+f['name']+'</span></a></label></span></td><td class="hide-download"><a href="'+f['url']+'" download>Download</a></td><td class="center hide2" style="width:50px;">'+(f['dir']?'':_s(f['size']))+'</td><td class="center hide1 date" style="width:70px;">'+f['date']+'</td></tr>';
+            html+='<tr class="datarow" style="background-color:'+rc+'"><td class="firsttd"><label class="cont"><span><label>&nbsp;&nbsp;&nbsp;<img class="file-icon-class" src="'+f['icon']+'" alt="" /></label><input type="checkbox" class="filecheck"><span class="checkmark"></span>&nbsp;&nbsp<a data-type="file" class="navigation" href="'+f['url']+'"><span class="filenamespan">'+f['name']+'</span></a></label></span></td><td class="hide-download"><a href="'+f['url']+'" download>Download</a></td><td class="center hide2" style="width:50px;">'+(f['dir']?'':_s(f['size']))+'</td><td class="center hide1 date" style="width:70px;">'+f['date']+'</td></tr>';
         }
         tbl.innerHTML=html+'</table>';
     }
@@ -547,8 +547,49 @@ $up_url=($up_dir!=''&&$up_dir!='.')?'/'.rawurlencode($up_dir):'index.php';
     </script>
     <script>
       $(document).ready(function(){
-        
-        console.log($('.filecheck:checked').length + $('.dircheck:checked').length);
+        $(".filecheck,.dircheck").change(function(){
+          if ($('.filecheck:checked').length + $('.dircheck:checked').length == 1)
+          {
+            $('.action-rename').show();
+          }
+          else
+          {
+            $('.action-rename').hide();
+          }
+        })
+      })
+    </script>
+    <script>
+      $(document).ready(function(){
+        $(".controlling").change(function(){
+          if (this.checked)
+          {
+            $('.action-rename').hide();
+            $('.filecheck').each(function(){
+              this.checked = true;
+            })
+            $('.dircheck').each(function(){
+              this.checked = true;
+            })
+          }
+          else
+          {
+            if ($('.filecheck:checked').length + $('.dircheck:checked').length == 1)
+            {
+              $('.action-rename').show();
+            }
+            else
+            {
+              $('.action-rename').hide();
+            }
+            $('.filecheck').each(function(){
+              this.checked = false;
+            })
+            $('.dircheck').each(function(){
+              this.checked = false;
+            })
+          }
+        })
       })
     </script>
 </body>
