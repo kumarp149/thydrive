@@ -77,6 +77,8 @@ $up_url=($up_dir!=''&&$up_dir!='.')?'/'.rawurlencode($up_dir):'index.php';
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
     <title>Dashboard - Brand</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/1.11.8/semantic.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/semantic/dist/semantic.min.css">
     <link rel="stylesheet" href="http://mathlearn.icu/assets/bootstrap/css/bootstrap.min.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i">
@@ -344,7 +346,7 @@ $up_url=($up_dir!=''&&$up_dir!='.')?'/'.rawurlencode($up_dir):'index.php';
         //console.log(_files.length+_dirs.length);
         idx.innerHTML='<div class="rounded gray" style="padding:5px 10px 5px 7px;color:#202020">' +
             '<p class="left">' +
-                '<label class="cont" style="margin-left: -5px;"><span><input type="checkbox"><span class="checkmark controlling"></span></span></label><?=$dir!=''?'&nbsp; (<a href="'.$up_url.'">Back</a>)':''?><br />' +
+                '<label class="cont" style="margin-left: -10px;"><span><input type="checkbox"><span class="checkmark controlling"></span></span></label>&nbsp;&nbsp;<div class="ui dropdown"><div style="left: -10px;" class="text">Actions</div><i class="dropdown icon"></i><div class="menu"><div class="item"><span class="description">Ctrl+N</span><strong>Upload</strong></div><div class="item"><span class="description">Ctrl+D</span><strong>Delete</strong></div><div class="item"><strong>Rename</strong></div><div class="item"><i class="folder icon"></i><strong>Move to Folder</strong></div></div></div><?=$dir!=''?'&nbsp; (<a href="'.$up_url.'">Back</a>)':''?><br />' +
             '</p>' +
             '<p class="right hide-for-mobiles">' +
                 'Sort: <span class="link hidename" onmousedown="return _srt(\'name\');" id="sort_name">Name</span>  <span class="link hidetype" onmousedown="return _srt(\'type\');" id="sort_type">Type</span> <span class="link hidesize" onmousedown="return _srt(\'size\');" id="sort_size">Size</span> <span class="link hidedate" onmousedown="return _srt(\'date\');" id="sort_date">Date</span>' +
@@ -528,7 +530,49 @@ $up_url=($up_dir!=''&&$up_dir!='.')?'/'.rawurlencode($up_dir):'index.php';
             <div id="idx"></div>
         </div>
       </span>
-
+      <div class="ui dropdown">
+  <div class="text">File</div>
+  <i class="dropdown icon"></i>
+  <div class="menu">
+    <div class="item">New</div>
+    <div class="item">
+      <span class="description">ctrl + o</span>
+      Open...
+    </div>
+    <div class="item">
+      <span class="description">ctrl + s</span>
+      Save as...
+    </div>
+    <div class="item">
+      <span class="description">ctrl + r</span>
+      Rename
+    </div>
+    <div class="item">Make a copy</div>
+    <div class="item">
+      <i class="folder icon"></i>
+      Move to folder
+    </div>
+    <div class="item">
+      <i class="trash icon"></i>
+      Move to trash
+    </div>
+    <div class="divider"></div>
+    <div class="item">Download As...</div>
+    <div class="item">
+      <i class="dropdown icon"></i>
+      Publish To Web
+      <div class="menu">
+        <div class="item">Google Docs</div>
+        <div class="item">Google Drive</div>
+        <div class="item">Dropbox</div>
+        <div class="item">Adobe Creative Cloud</div>
+        <div class="item">Private FTP</div>
+        <div class="item">Another Service...</div>
+      </div>
+    </div>
+    <div class="item">E-mail Collaborators</div>
+  </div>
+</div>
         <footer class="bg-white sticky-footer">
             <div class="container my-auto">
                 <div class="text-center my-auto copyright"><span>Copyright © ThyDrive 2020</span></div></br>
@@ -539,6 +583,19 @@ $up_url=($up_dir!=''&&$up_dir!='.')?'/'.rawurlencode($up_dir):'index.php';
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.js"></script>
     <script src="http://mathlearn.icu/assets/js/theme.js"></script>
+    <script src="/semantic/dist/semantic.min.js"></script>
+    <script src="/semantic/dist/semantic.js"></script>
+    <script>
+  $(document)
+    .ready(function() {
+      $('.ui.selection.dropdown').dropdown();
+      $('.ui.dropdown').dropdown();
+      $('.ui.menu .ui.dropdown').dropdown({
+        on: 'hover'
+      });
+    })
+  ;
+  </script>
     <script>
       $(document).ready(function(){
           $("#logoutbtn").click(function(){
