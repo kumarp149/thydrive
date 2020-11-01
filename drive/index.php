@@ -345,12 +345,10 @@ $up_url=($up_dir!=''&&$up_dir!='.')?'/'.rawurlencode($up_dir):'index.php';
         _tpg=Math.ceil((_files.length+_dirs.length)/_ppg);
         //console.log(_files.length+_dirs.length);
         idx.innerHTML='<div class="rounded gray" style="padding:5px 10px 5px 7px;color:#202020">' +
-            '<p class="left">' +
-                '<label class="cont" style="margin-left: -10px;"><span><input type="checkbox"><span class="checkmark controlling"></span></span></label>&nbsp;&nbsp;<div class="ui dropdown"><div style="left: -10px;" class="text">Actions</div><i class="dropdown icon"></i><div class="menu"><div class="item"><span class="description">Ctrl+N</span><strong>Upload</strong></div><div class="item"><span class="description">Ctrl+D</span><strong>Delete</strong></div><div class="item"><strong>Rename</strong></div><div class="item"><i class="folder icon"></i><strong>Move to Folder</strong></div></div></div><?=$dir!=''?'&nbsp; (<a href="'.$up_url.'">Back</a>)':''?><br />' +
-            '</p>' +
-            '<p class="right hide-for-mobiles">' +
+            '<div class="row pb-2 float-left"><label class="cont" style="margin-left: 4px"><span><input type="checkbox" class="" /><span class="checkmark controlling"></span></span></label><span><div class="ui dropdown" style="margin-left: 15px;"><div style="" class="text"><strong>Actions</strong></div><i class="dropdown icon"></i><div class="menu"><div class="item"><span class="description">Ctrl+N</span><strong>Upload</strong></div><div class="item"><span class="description">Ctrl+D</span><strong>Delete</strong></div><div class="item"><strong>Rename</strong></div><div class="item"><i class="folder icon"></i><strong>Move to Folder</strong></div></div></div><?=$dir!=''?'&nbsp; (<a href="'.$up_url.'">Back</a>)':''?></span></div>' +
+            '<div class="float-right hide-for-mobiles" style="">' +
                 'Sort: <span class="link hidename" onmousedown="return _srt(\'name\');" id="sort_name">Name</span>  <span class="link hidetype" onmousedown="return _srt(\'type\');" id="sort_type">Type</span> <span class="link hidesize" onmousedown="return _srt(\'size\');" id="sort_size">Size</span> <span class="link hidedate" onmousedown="return _srt(\'date\');" id="sort_date">Date</span>' +
-            '</p>' +
+            '</div>' +
             '<div style="clear:both;"></div>' +
         '</div><div id="idx_tbl"></div>';
         tbl=_obj('idx_tbl');
