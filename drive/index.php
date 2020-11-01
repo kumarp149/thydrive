@@ -93,7 +93,7 @@ $up_url=($up_dir!=''&&$up_dir!='.')?'/'.rawurlencode($up_dir):'index.php';
   padding-left: 35px;
   margin-bottom: 12px;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 17px;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
@@ -113,6 +113,10 @@ $up_url=($up_dir!=''&&$up_dir!='.')?'/'.rawurlencode($up_dir):'index.php';
 {
   transform: rotate(45deg);
   -webkit-transform: rotate(45deg);
+}
+.date
+{
+  display: none;
 }
 .up
 {
@@ -174,16 +178,6 @@ $up_url=($up_dir!=''&&$up_dir!='.')?'/'.rawurlencode($up_dir):'index.php';
 }
     a { cursor : pointer; }
     #idx { border: 3px solid #fff; margin-left: 2%; margin-right: 2%; font-size: 20px; min-width: 50px;}
-    #idy { border: 3px solid #fff; margin-left: 2%; margin-right: 2%; font-size: 20px; min-width: 50px;}
-    #idy p { padding: 0px; margin: 0px;line-height:1.4em;}
-    #idy p.left { float:left;width:60%;padding:3px;color:#606060;}
-    #idy p.right {float:right;width:35%;text-align:right;color:#707070;padding:3px;}
-    #idy a:hover { text-decoration: none; }
-    #idy a:link    { color: #0066CC; }
-    #idy a:visited { color: #0066CC; }
-    #idy a:hover   { text-decoration: none; }
-    #idy a:active  { color: #0066CC; }
-    #idy strong { font-family: "Trebuchet MS", tahoma, arial; font-size: 1.2em; font-weight: bold; color: #202020; padding-bottom: 3px; margin: 0px; }
     #idx td.center { text-align: center; }
     #idx td { border-bottom: 1px solid #f0f0f0; }
     #idx img { margin-bottom: -2px; }
@@ -253,6 +247,10 @@ $up_url=($up_dir!=''&&$up_dir!='.')?'/'.rawurlencode($up_dir):'index.php';
       position: relative;
       top: -3.5px;
     }
+    .hide1
+    {
+      display: none;
+    }
     .hide-download
     {
       position: relative;
@@ -274,28 +272,6 @@ $up_url=($up_dir!=''&&$up_dir!='.')?'/'.rawurlencode($up_dir):'index.php';
     }
     @media only screen and (max-width: 900px)
     {
-      @media only screen and (max-width: 750px)
-      {
-        @media only screen and (max-width: 550px)
-        {
-        }
-        @media only screen and (max-width: 480px)
-        {
-
-        }
-        @media only screen and (max-width: 390px)
-        {
-
-        }
-        @media only screen and (max-width: 360px)
-        {
-
-        }
-        @media only screen and (max-width: 335px)
-        {
-
-        }
-      }
         .hide1
         {
             display: none;
@@ -367,50 +343,25 @@ $up_url=($up_dir!=''&&$up_dir!='.')?'/'.rawurlencode($up_dir):'index.php';
     {
         //_tpg = 1;
         var _cnt=_dirs.concat(_files);if(!tbl)return;if(_cpg>_tpg){_cpg=_tpg;return;}else if(_cpg<1){_cpg=1;return;}var a=(_cpg-1)*_ppg;var b=_cpg*_ppg;var j=0;var html='';
-        //console.log(_tpg);
-        //console.log(_ppg);
         if(_tpg>1)html+='<p style="padding:5px 5px 0px 7px;color:#202020;text-align:right;"><span class="link" onmousedown="_pp();return false;">Previous</span> ('+_cpg+'/'+_tpg+') <span class="link" onmousedown="_np();return false;">Next</span></p>';
         html+='<table cellspacing="0" cellpadding="5" border="0">';
-        /*for(var i=a;i<b&&i<(_files.length+_dirs.length);++i)
-        {
-            //var str = makeid(6);
-            var f=_cnt[i];var rc=j++&1?_c1:_c2;
-            html+='<tr class="datarow" style="background-color:'+rc+'"><td class="firsttd"><label class="cont"><span><label>&nbsp;&nbsp;&nbsp;<img class="file-icon-class" src="'+f['icon']+'" alt="" /></label><input type="checkbox"><span class="checkmark"></span>&nbsp;&nbsp<a class="navigation" href="'+f['url']+'"><span class="filenamespan">'+f['name']+'</span></a></label></span></td><td><a>Download</a></td><td class="center hide2" style="width:50px;">'+(f['dir']?'':_s(f['size']))+'</td><td class="center hide1" style="width:70px;">'+f['date']+'</td></tr>';
-        }*/
-        //html+='<tr class="datarow" style="background-color:'+rc+'"><td class="firsttd"><label class="cont"><span><label>&nbsp;&nbsp;&nbsp;<img class="file-icon-class" src="'+f['icon']+'" alt="" /></label><input type="checkbox"><span class="checkmark"></span>&nbsp;&nbsp<a data-type="directory" class="navigation" href="'+f['url']+'"><span class="filenamespan">'+f['name']+'</span></a></label></span></td><td class="hide-download"><a></a></td><td class="center hide2" style="width:50px;">'+(f['dir']?'':_s(f['size']))+'</td><td class="center hide1" style="width:70px;">'+f['date']+'</td></tr>';
         for(var i=a;i<b&&i<(_dirs.length);++i)
         {
-            //var str = makeid(6);
-            //console.log("Sruteesh");
             var x = document.getElementById("content").getBoundingClientRect().width;
-            //console.log(x);
             var f=_cnt[i];var rc=j++&1?_c1:_c2;
             var dir_name_length = f['name'].length;
             if (dir_name_length > 12)
             {
               var last__dir_dot = f['name'].lastIndexOf(".");
-              //var str_dir_last =   f['name'].substring(last_dot,strlen(f['name']));
-              //console.log("Sruteesh");
             }
             html+='<tr class="datarow" style="background-color:'+rc+'"><td class="firsttd"><label class="cont"><span><label>&nbsp;&nbsp;&nbsp;<img class="file-icon-class" src="'+f['icon']+'" alt="" /></label><input type="checkbox"><span class="checkmark"></span>&nbsp;&nbsp<a data-type="directory" class="navigation" href="'+f['url']+'"><span class="filenamespan">'+f['name']+'</span></a></label></span></td><td class="hide-download"><a></a></td><td class="center hide2" style="width:50px;">'+(f['dir']?'':_s(f['size']))+'</td><td class="center hide1" style="width:70px;">'+f['date']+'</td></tr>';
             c = _dirs.length;
         }
         for(var i=c;i<b&&i<(_files.length+_dirs.length);++i)
         {
-            //console.log("Sruteesh");
-            //var str = makeid(6);
             var f=_cnt[i];var rc=j++&1?_c1:_c2;
             var file_name_length = f['name'].length;
-            /*if (file_name_length > 16 && $(window).width() < 400)
-            {
-              var last_dot = f['name'].lastIndexOf(".");
-              var str_last =   f['name'].substring(last_dot,f['name'].length);
-              var str_first = f['name'].substring(0,9);
-              f['name'] = str_first + ".." + str_last;
-              console.log(str_last);
-              console.log(window.innerWidth);
-            }*/
-            html+='<tr class="datarow" style="background-color:'+rc+'"><td class="firsttd"><label class="cont"><span><label>&nbsp;&nbsp;&nbsp;<img class="file-icon-class" src="'+f['icon']+'" alt="" /></label><input type="checkbox"><span class="checkmark"></span>&nbsp;&nbsp<a data-type="file" class="navigation" href="'+f['url']+'"><span class="filenamespan">'+f['name']+'</span></a></label></span></td><td class="hide-download"><a href="'+f['url']+'" download>Download</a></td><td class="center hide2" style="width:50px;">'+(f['dir']?'':_s(f['size']))+'</td><td class="center hide1" style="width:70px;">'+f['date']+'</td></tr>';
+            html+='<tr class="datarow" style="background-color:'+rc+'"><td class="firsttd"><label class="cont"><span><label>&nbsp;&nbsp;&nbsp;<img class="file-icon-class" src="'+f['icon']+'" alt="" /></label><input type="checkbox"><span class="checkmark"></span>&nbsp;&nbsp<a data-type="file" class="navigation" href="'+f['url']+'"><span class="filenamespan">'+f['name']+'</span></a></label></span></td><td class="hide-download"><a href="'+f['url']+'" download>Download</a></td><td class="center hide2" style="width:50px;">'+(f['dir']?'':_s(f['size']))+'</td><td class="center hide1 date" style="width:70px;">'+f['date']+'</td></tr>';
         }
         tbl.innerHTML=html+'</table>';
     }
@@ -522,9 +473,6 @@ $up_url=($up_dir!=''&&$up_dir!='.')?'/'.rawurlencode($up_dir):'index.php';
                     </ul>
             </div>
             </nav>
-            <div id="idy">
-                <div class="rounded gray" style="padding:5px 10px 5px 7px;color:#202020"><p class="left"><a class="delete"><strong>Delete</strong>&nbsp;&nbsp;<a class="rename"><strong>Rename</strong></a><br></p></div>
-            </div></br>
             <div id="idx"></div>
         </div>
       </span>
@@ -564,13 +512,6 @@ $up_url=($up_dir!=''&&$up_dir!='.')?'/'.rawurlencode($up_dir):'index.php';
       })
     </script>
     <script>
-     /*$(document).ready(function(){
-       //$(".fileupload").click();
-       $(".upload").click(function(){
-         //window.location.href = "https://google.com"
-         $(".fileupload").trigger('click');
-       })
-     })*/
     </script>
     <script>
       $(document).ready(function(){
@@ -597,7 +538,6 @@ $up_url=($up_dir!=''&&$up_dir!='.')?'/'.rawurlencode($up_dir):'index.php';
       {
         console.log(files[i].name);
       }
-      //Swal.fire('Any fool can use a computer')
       if (number_of_files > 10)
       {
         Swal.fire({
