@@ -45,21 +45,13 @@ while(false!==($f=readdir($h)))
 {
     if(in_array($f,$ignore))continue;
     $URL = dirname($_SERVER["REQUEST_URI"]);
-    /*echo $URL."</br>";
-    echo $_SERVER["REQUEST_URI"];
-    die();*/
-    /*if(is_dir($path.$f))$dirs[]=array('name'=>$f,'date'=>filemtime($path.$f),'url'=>"$URL"."/".rawurlencode(trim("$dir/$f",'/')).'/index.php');*/
     if (strpos($_SERVER['REQUEST_URI'],"index.php") != null)
     {
-      /*echo $_SERVER['REQUEST_URI'];
-      die();*/
       if(is_dir($path.$f))$dirs[]=array('name'=>$f,'date'=>filemtime($path.$f),'url'=>"$URL"."/".rawurlencode(trim("$dir/$f",'/')).'/');
       else$files[]=array('name'=>$f,'size'=>filesize($path.$f),'date'=>filemtime($path.$f),'url'=>trim("$dir/".rawurlencode($f),'/'));
     }
     else
     {
-      /*echo $_SERVER['REQUEST_URI'];
-      die();*/
       if(is_dir($path.$f))$dirs[]=array('name'=>$f,'date'=>filemtime($path.$f),'url'=>$_SERVER['REQUEST_URI'].rawurlencode(trim("$dir/$f",'/')).'/');
       else$files[]=array('name'=>$f,'size'=>filesize($path.$f),'date'=>filemtime($path.$f),'url'=>trim("$dir/".rawurlencode($f),'/'));
     }
