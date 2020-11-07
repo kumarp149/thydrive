@@ -1,1 +1,1 @@
-Hey
+<div style="text-align: center;">This is an online file storage system</div>
