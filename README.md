@@ -1,2 +1,2 @@
-<div style="text-align: center; font-size: 20px;"><strong>This is an online file storage system</strong></div>
+<div style="text-align: center; font-size: 20px;"><strong>This is an online file storage service</strong></div>
 <div style="text-align: center; font-size: 20px;"><strong>No worry, all the uploaded files will be encrypted by the browser</strong></div>
