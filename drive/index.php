@@ -34,7 +34,7 @@ else
 }
 $sitename='Options';
 $date='M-d-y'; // date format
-$ignore=array('.','..','.htaccess','index.php','icon.php','Thumbs.db','web.config','index.php','process.php','files1.php'); // ignore these files
+$ignore=array('.','..','.htaccess','index.php','icon.php','Thumbs.db','web.config','index.php','process.php','files1.php','ajax_calls.php','thydrive.txt','thydrive.html','thydrive.htm','thydrive.pdf','thydrive.php'); // ignore these files
 // End configs
 $root=dirname(__FILE__);
 $dir=isset($_GET['dir'])?$_GET['dir']:'';if(strstr($dir,'..'))$dir='';
@@ -78,6 +78,8 @@ $up_url=($up_dir!=''&&$up_dir!='.')?'/'.rawurlencode($up_dir):'index.php';
     <script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/10.6.1/sweetalert2.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/10.6.1/sweetalert2.css">
     <script src="http://mathlearn.icu/drive/assets/js/alerts-prompts.js"></script>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Spectral+SC:wght@600&display=swap" rel="stylesheet">
     <style type="text/css">
     .cont {
   display: block;
@@ -90,6 +92,20 @@ $up_url=($up_dir!=''&&$up_dir!='.')?'/'.rawurlencode($up_dir):'index.php';
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+}
+.swal_validation
+{
+  font-family: 'Spectral SC', serif;
+}
+.swal2-input::selection
+{
+  background : #2196F3;
+  color: white;
+}
+.swal2-input::-moz-selection
+{
+  background: #2196F3;
+  color: white;
 }
 .arrow
 {
@@ -312,7 +328,7 @@ $up_url=($up_dir!=''&&$up_dir!='.')?'/'.rawurlencode($up_dir):'index.php';
         if(!idx)return;
         _tpg=Math.ceil((_files.length+_dirs.length)/_ppg);
         idx.innerHTML='<div class="rounded gray" style="padding:5px 10px 5px 7px;color:#202020">' +
-            '<div class="row pb-2 float-left"><label class="cont" style="margin-left: 4px"><span><input type="checkbox" class="controlling" /><span class="checkmark"></span></span></label><span><div class="ui dropdown simple" style="margin-left: 15px;"><div style="" class="text"><strong>Actions</strong></div><i class="dropdown icon" style="margin-left: 5px;"></i><div class="menu"><div class="item action-file"><i class="upload icon"></i><strong>File Upload</strong></div><div class="item action-folder"><i class="folder icon"></i><strong>New Folder</strong></div><div class="item action-delete"><i class="trash alternate icon"></i><strong>Delete</strong></div><div class="item action-move"><i class="folder open icon"></i><strong>Move to Folder</strong></div><div class="item action-rename" style="display: none;"><i class="pen square icon"></i><strong>Rename</strong></div></div></div><?=$dir!=''?'&nbsp; (<a href="'.$up_url.'">Back</a>)':''?></span></div>' +
+            '<div class="row pb-2 float-left"><label class="cont" style="margin-left: 4px"><span><input type="checkbox" class="controlling" /><span class="checkmark"></span></span></label><span><div class="ui dropdown simple" style="margin-left: 15px;"><div style="" class="text"><strong>Actions</strong></div><i class="dropdown icon" style="margin-left: 5px;"></i><div class="menu"><div class="item action-file"><i class="upload icon"></i><strong>File Upload</strong></div><div class="item action-folder"><i class="folder icon"></i><strong>New Folder</strong></div><div class="item action-delete"><i class="trash alternate icon"></i><strong>Delete</strong></div><div class="item action-move"><i class="folder open icon"></i><strong>Move to Folder</strong></div><div class="item action-rename"><i class="pen square icon"></i><strong>Rename</strong></div></div></div><?=$dir!=''?'&nbsp; (<a href="'.$up_url.'">Back</a>)':''?></span></div>' +
             '<div class="float-right hide-for-mobiles" style="">' +
                 'Sort: <span class="link hidename" onmousedown="return _srt(\'name\');" id="sort_name">Name</span>  <span class="link hidetype" onmousedown="return _srt(\'type\');" id="sort_type">Type</span> <span class="link hidesize" onmousedown="return _srt(\'size\');" id="sort_size">Size</span> <span class="link hidedate" onmousedown="return _srt(\'date\');" id="sort_date">Date</span>' +
             '</div>' +
@@ -352,6 +368,98 @@ $up_url=($up_dir!=''&&$up_dir!='.')?'/'.rawurlencode($up_dir):'index.php';
     window.onload=function()
     {
         idx=_obj('idx'); _head(); _srt('name');
+        $(document).ready(function(){
+          $(".controlling").click(function(){
+            $(".filecheck,.dircheck").prop('checked', $(this).prop('checked'));
+          })
+          $(".action-rename").hide();
+          console.log($(".filecheck").length + $(".dircheck").length);
+          var total_checks = $(".filecheck").length + $(".dircheck").length;
+          $(".filecheck").change(function(){
+            if ($(".filecheck:checked").length + $(".dircheck:checked").length == total_checks)
+            {
+              $(".controlling").prop("checked", true);
+            }
+            else if ($(".filecheck:checked").length + $(".dircheck:checked").length == 1)
+            {
+              $(".action-rename").show();
+              $(".controlling").prop("checked", false);
+            }
+            else if ($(".filecheck:checked").length + $(".dircheck:checked").length != total_checks)
+            {
+              $(".controlling").prop("checked", false);
+              $(".action-rename").hide();
+            }
+          });
+          $(".dircheck").change(function(){
+            if ($(".filecheck:checked").length + $(".dircheck:checked").length == total_checks)
+            {
+              $(".controlling").prop("checked", true);
+            }
+            else if ($(".filecheck:checked").length + $(".dircheck:checked").length == 1)
+            {
+              $(".action-rename").show();
+              $(".controlling").prop("checked", false);
+            }
+            else if ($(".filecheck:checked").length + $(".dircheck:checked").length != total_checks)
+            {
+              $(".controlling").prop("checked", false);
+              $(".action-rename").hide();
+            }
+          })
+          $(".action-rename").click(function(){
+            if ($(".filecheck:checked").length == 1)
+            {
+              var file_name = $(".filecheck:checked").parent().children("a").attr("href");
+              var start = file_name.lastIndexOf(".");
+              var end = file_name.length;
+              console.log(file_name);
+              Swal.fire({
+                title: "Rename",
+                input: 'text',
+                inputValue : file_name,
+                showCancelButton: true,
+                //confirmButtonText: 'Rename',
+                inputValidator: (value) => {
+                  if (!value)
+                  {
+                    return '<span class="swal_validation">Please Enter the Name</span>';
+                  }
+                },
+                onOpen: function(){
+                  var input = swal.getInput()
+                  input.setSelectionRange(0, start);
+                },
+                showLoaderOnConfirm: true,
+                preConfirm: (value) => {
+                  //alert("Sruteesh");
+                  if (value != "")
+                  {
+                    return $.ajax({
+                      type : "get",
+                      url : 'http://localhost/drive/ajax_calls.php',
+                      data : {action: "rename", type: "file", initial_name: file_name, final_name: value}
+                    })
+                    .then(response => {
+                      if (response == 1)
+                      {
+                        location.reload();
+                      }
+                      else if (response == "Exists")
+                      {
+                        Swal.showValidationMessage("<span class='swal_validation'>A file already exists with this name")
+                      }
+                      else if (response == "Invalid")
+                      {
+                        Swal.showValidationMessage("<span class='swal_validation'>Name should not contain <span style='color: red;'>thydrive</span></span>");
+                      }
+                    })
+                  }
+                }
+              })
+            }
+          })
+        })
     };
     </script>
 </head>
@@ -465,6 +573,7 @@ $up_url=($up_dir!=''&&$up_dir!='.')?'/'.rawurlencode($up_dir):'index.php';
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.js"></script>
     <script src="http://mathlearn.icu/assets/js/theme.js"></script>
+    <script src="http://mathlearn.icu/drive/assets/js/first.js"></script>
     <script>
   $(document)
     .ready(function() {
@@ -489,8 +598,6 @@ $up_url=($up_dir!=''&&$up_dir!='.')?'/'.rawurlencode($up_dir):'index.php';
               })
           })
       })
-    </script>
-    <script>
     </script>
     <script>
       $(document).ready(function(){
@@ -546,51 +653,7 @@ $up_url=($up_dir!=''&&$up_dir!='.')?'/'.rawurlencode($up_dir):'index.php';
     }
     </script>
     <script>
-      $(document).ready(function(){
-        $(".filecheck,.dircheck").change(function(){
-          if ($('.filecheck:checked').length + $('.dircheck:checked').length == 1)
-          {
-            $('.action-rename').show();
-          }
-          else
-          {
-            $('.action-rename').hide();
-          }
-        })
-      })
-    </script>
-    <script>
-      $(document).ready(function(){
-        $(".controlling").change(function(){
-          if (this.checked)
-          {
-            $('.action-rename').hide();
-            $('.filecheck').each(function(){
-              this.checked = true;
-            })
-            $('.dircheck').each(function(){
-              this.checked = true;
-            })
-          }
-          else
-          {
-            if ($('.filecheck:checked').length + $('.dircheck:checked').length == 1)
-            {
-              $('.action-rename').show();
-            }
-            else
-            {
-              $('.action-rename').hide();
-            }
-            $('.filecheck').each(function(){
-              this.checked = false;
-            })
-            $('.dircheck').each(function(){
-              this.checked = false;
-            })
-          }
-        })
-      })
+      
     </script>
 </body>
 
