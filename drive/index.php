@@ -453,6 +453,10 @@ $up_url=($up_dir!=''&&$up_dir!='.')?'/'.rawurlencode($up_dir):'index.php';
                       {
                         Swal.showValidationMessage("<span class='swal_validation'>Name should not contain <span style='color: red;'>thydrive</span></span>");
                       }
+                      else if (response == "Large")
+                      {
+                        Swal.showValidationMessage("<span class='swal_validation'>Must contain less than 20 characters</span>");
+                      }
                     })
                   }
                 }
