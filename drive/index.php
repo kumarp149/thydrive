@@ -60,7 +60,6 @@ closedir($h);
 $current_dir_name = basename($dir);
 $up_dir=dirname($dir);
 $up_url=($up_dir!=''&&$up_dir!='.')?'/'.rawurlencode($up_dir):'index.php';
-
 ?>
 <!DOCTYPE html>
 <html>
@@ -80,6 +79,8 @@ $up_url=($up_dir!=''&&$up_dir!='.')?'/'.rawurlencode($up_dir):'index.php';
     <script src="http://mathlearn.icu/drive/assets/js/alerts-prompts.js"></script>
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Spectral+SC:wght@600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Patua+One&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Rufina:wght@700&display=swap" rel="stylesheet">
     <style type="text/css">
     .cont {
   display: block;
@@ -95,7 +96,7 @@ $up_url=($up_dir!=''&&$up_dir!='.')?'/'.rawurlencode($up_dir):'index.php';
 }
 .swal_validation
 {
-  font-family: 'Spectral SC', serif;
+  font-family: 'Rufina', serif;
 }
 .swal2-input::selection
 {
@@ -106,6 +107,10 @@ $up_url=($up_dir!=''&&$up_dir!='.')?'/'.rawurlencode($up_dir):'index.php';
 {
   background: #2196F3;
   color: white;
+}
+.delete-swal
+{
+  font-family: 'Patua One', cursive;
 }
 .arrow
 {
@@ -309,7 +314,7 @@ $up_url=($up_dir!=''&&$up_dir!='.')?'/'.rawurlencode($up_dir):'index.php';
     </style>
     <script type="text/javascript">
     var _c1='#fefefe'; var _c2='#fafafa'; var _ppg=100000000000000; var _cpg=1; var _files=[]; var _dirs=[]; var _tpg=null; var _tsize=0; var _sort='date'; var _sdir={'type':0,'name':0,'size':0,'date':1}; var idx=null; var tbl=null;
-    function _obj(s){return document.getElementById(s);}
+    function _obj(s){return document.getElementById(s);}  //returns a dom element
     function _ge(n){n=n.substr(n.lastIndexOf('.')+1);return n.toLowerCase();}
     function _nf(n,p){if(p>=0){var t=Math.pow(10,p);return Math.round(n*t)/t;}}
     function _s(v,u){if(!u)u='B';if(v>1024&&u=='B')return _s(v/1024,'KB');if(v>1024&&u=='KB')return _s(v/1024,'MB');if(v>1024&&u=='MB')return _s(v/1024,'GB');return _nf(v,1)+'&nbsp;'+u;}
@@ -362,6 +367,7 @@ $up_url=($up_dir!=''&&$up_dir!='.')?'/'.rawurlencode($up_dir):'index.php';
         }
         tbl.innerHTML=html+'</table>';
     }
+
     <?php while(list(,$d)=each($dirs))print sprintf("_d('%s','%s','%s');\n",addslashes($d['name']),date($date,$d['date']),addslashes($d['url'])); ?>
     <?php while(list(,$f)=each($files))print sprintf("_f('%s',%d,'%s','%s',%d);\n",addslashes($f['name']),$f['size'],date($date,$f['date']),addslashes($f['url']),$f['date']);?>
 
@@ -371,12 +377,29 @@ $up_url=($up_dir!=''&&$up_dir!='.')?'/'.rawurlencode($up_dir):'index.php';
         $(document).ready(function(){
           $(".controlling").click(function(){
             $(".filecheck,.dircheck").prop('checked', $(this).prop('checked'));
+            if ($(".filecheck:checked").length + $(".dircheck:checked").length != 0)
+            {
+              $(".action-delete").show();
+            }
+            if ($(".filecheck:checked").length + $(".dircheck:checked").length == 0)
+            {
+              $(".action-delete").hide();
+            }
           })
           $(".action-rename").hide();
+          $(".action-delete").hide();
           console.log($(".filecheck").length + $(".dircheck").length);
           var total_checks = $(".filecheck").length + $(".dircheck").length;
           $(".filecheck").change(function(){
-            if ($(".filecheck:checked").length + $(".dircheck:checked").length == total_checks)
+            if ($(".filecheck:checked").length + $(".dircheck:checked").length != 0)
+            {
+              $(".action-delete").show();
+            }
+            if ($(".filecheck:checked").length + $(".dircheck:checked").length == 0)
+            {
+              $(".action-delete").hide();
+            }
+            if ($(".filecheck:checked").length + $(".dircheck:checked").length == total_checks && total_checks != 0)
             {
               $(".controlling").prop("checked", true);
             }
@@ -392,6 +415,14 @@ $up_url=($up_dir!=''&&$up_dir!='.')?'/'.rawurlencode($up_dir):'index.php';
             }
           });
           $(".dircheck").change(function(){
+            if ($(".filecheck:checked").length + $(".dircheck:checked").length != 0)
+            {
+              $(".action-delete").show();
+            }
+            if ($(".filecheck:checked").length + $(".dircheck:checked").length == 0)
+            {
+              $(".action-delete").hide();
+            }
             if ($(".filecheck:checked").length + $(".dircheck:checked").length == total_checks)
             {
               $(".controlling").prop("checked", true);
@@ -411,6 +442,7 @@ $up_url=($up_dir!=''&&$up_dir!='.')?'/'.rawurlencode($up_dir):'index.php';
             if ($(".filecheck:checked").length == 1)
             {
               var file_name = $(".filecheck:checked").parent().children("a").attr("href");
+              file_name = decodeURIComponent(file_name);
               var start = file_name.lastIndexOf(".");
               var end = file_name.length;
               console.log(file_name);
@@ -446,7 +478,7 @@ $up_url=($up_dir!=''&&$up_dir!='.')?'/'.rawurlencode($up_dir):'index.php';
                       }
                       else if (response == "Exists")
                       {
-                        Swal.showValidationMessage("<span class='swal_validation'>A file already exists with this name")
+                        Swal.showValidationMessage("<span class='swal_validation'>A file/folder already exist with this name")
                       }
                       else if (response == "Invalid")
                       {
@@ -461,6 +493,111 @@ $up_url=($up_dir!=''&&$up_dir!='.')?'/'.rawurlencode($up_dir):'index.php';
                 }
               })
             }
+            else if ($(".dircheck:checked").length == 1)
+            {
+              var path_name = $(".dircheck:checked").parent().children("a").attr("href");
+              path_name = decodeURIComponent(path_name);
+              console.log(path_name);
+              var split_name = path_name.split("/");
+              console.log(split_name);
+              var dirname = split_name[split_name.length-2];
+              console.log(dirname);
+              Swal.fire({
+                title: "Rename",
+                input: 'text',
+                inputValue : dirname,
+                showCancelButton: true,
+                confirmButtonText: 'Rename',
+                inputValidator: (value) => {
+                  if (!value)
+                  {
+                    return '<span class="swal_validation">Please Enter the Name</span>';
+                  }
+                },
+                onOpen: function(){
+                  var input = swal.getInput()
+                  input.setSelectionRange(0,dirname.length);
+                },
+                showLoaderOnConfirm: true,
+                preConfirm: (value) => {
+                  if (value != "")
+                  {
+                    return $.ajax({
+                      type : "get",
+                      url : "http://localhost/drive/ajax_calls.php",
+                      data : {action: "rename", type: "dir", initial_name: dirname, initial_path: path_name, final_name: value}
+                    })
+                    .then(response => {
+                      if (response == 1)
+                      {
+                        location.reload();
+                      }
+                      else if (response == "Exists")
+                      {
+                        Swal.showValidationMessage("<span class='swal_validation'>A file/folder already exist with this name")
+                      }
+                      else if (response == "Invalid")
+                      {
+                        Swal.showValidationMessage("<span class='swal_validation'>Name should not contain <span style='color: red;'>thydrive</span></span>");
+                      }
+                      else if (response == "Large")
+                      {
+                        Swal.showValidationMessage("<span class='swal_validation'>Must contain less than 19 characters</span>");
+                      }
+                    })
+                  }
+                }
+              })
+            }
+          })
+          $(".action-delete").click(function(){
+            var files_checked = [];
+            var dirs_checked = [];
+            var dir_paths = [];
+            $(".filecheck:checked").each(function(){
+              files_checked.push(decodeURIComponent($(this).parent().children("a").attr("href")));
+            });
+            console.log(files_checked);
+            $(".dircheck:checked").each(function(){
+              dir_paths.push(decodeURIComponent($(this).parent().children("a").attr("href")));
+              var temp_path = decodeURIComponent($(this).parent().children("a").attr("href"));
+              var temp_name = temp_path.split("/");
+              dirs_checked.push(temp_name[temp_name.length-2]);
+            })
+            console.log(dirs_checked);
+            Swal.fire({
+              title: "Confirm",
+              text: "You are about to delete "+files_checked.length+" files and "+dirs_checked.length+" folders",
+              html:
+                  '<span>You are about to delete '+files_checked.length+' files and '+dirs_checked.length+' folders'+
+                  '</br></br><b class="delete-swal">This action cannot be undone</b>',
+              showCancelButton: true,
+              preConfirm: () => {
+                return $.ajax({
+                  type : "get",
+                  url : "http://localhost/drive/ajax_calls.php",
+                  data : {
+                    action : "delete",
+                    files_arr : files_checked,
+                    dirs_arr : dirs_checked
+                  }
+                })
+                .then(response => {
+                  if (response == 1)
+                  {
+                    Swal.fire({
+                      icon: "success",
+                      title : "Confirmation",
+                      text: "Selected files succesfully deleted"
+                    })
+                    .then(response => {
+                      idx=_obj('idx'); _head(); _srt('name');
+                      _tb1();
+                    })
+                  }
+                })
+              }
+            })
           })
         })
     };
