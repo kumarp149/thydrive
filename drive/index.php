@@ -576,7 +576,6 @@ $up_url=($up_dir!=''&&$up_dir!='.')?'/'.rawurlencode($up_dir):'index.php';
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.js"></script>
     <script src="http://mathlearn.icu/assets/js/theme.js"></script>
-    <script src="http://mathlearn.icu/drive/assets/js/first.js"></script>
     <script>
   $(document)
     .ready(function() {
