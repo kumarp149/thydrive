@@ -419,7 +419,7 @@ $up_url=($up_dir!=''&&$up_dir!='.')?'/'.rawurlencode($up_dir):'index.php';
                 input: 'text',
                 inputValue : file_name,
                 showCancelButton: true,
-                //confirmButtonText: 'Rename',
+                confirmButtonText: 'Rename',
                 inputValidator: (value) => {
                   if (!value)
                   {
@@ -432,7 +432,6 @@ $up_url=($up_dir!=''&&$up_dir!='.')?'/'.rawurlencode($up_dir):'index.php';
                 },
                 showLoaderOnConfirm: true,
                 preConfirm: (value) => {
-                  //alert("Sruteesh");
                   if (value != "")
                   {
                     return $.ajax({
@@ -655,9 +654,6 @@ $up_url=($up_dir!=''&&$up_dir!='.')?'/'.rawurlencode($up_dir):'index.php';
         });
       }
     }
-    </script>
-    <script>
-      
     </script>
 </body>
 
