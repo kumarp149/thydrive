@@ -6,6 +6,9 @@ session_start();
   die();
 }*/
 @ob_start('ob_gzhandler');
+function my_function()
+{
+clearstatcache();
 if(isset($_GET['icon']))
 {
     $e=$_GET['icon'];
@@ -34,8 +37,8 @@ else
 }
 $sitename='Options';
 $date='M-d-y'; // date format
-$ignore=array('.','..','.htaccess','index.php','icon.php','Thumbs.db','web.config','index.php','process.php','files1.php','ajax_calls.php','thydrive.txt','thydrive.html','thydrive.htm','thydrive.pdf','thydrive.php'); // ignore these files
 // End configs
+$ignore=array('.','..','.htaccess','index.php','icon.php','Thumbs.db','web.config','index.php','process.php','files1.php','ajax_calls.php','thydrive.txt','thydrive.html','thydrive.htm','thydrive.pdf','thydrive.php','assets','commands.txt','submit','dir_details.php','test.php'); // ignore these files
 $root=dirname(__FILE__);
 $dir=isset($_GET['dir'])?$_GET['dir']:'';if(strstr($dir,'..'))$dir='';
 $path="$root/$dir/";
@@ -60,6 +63,16 @@ closedir($h);
 $current_dir_name = basename($dir);
 $up_dir=dirname($dir);
 $up_url=($up_dir!=''&&$up_dir!='.')?'/'.rawurlencode($up_dir):'index.php';
+$ret_arr = array();
+array_push($ret_arr, $dirs);
+array_push($ret_arr, $date);
+array_push($ret_arr, $files);
+return $ret_arr;
+}
+$store = my_function();
+$dirs = $store[0];
+$date = $store[1];
+$files = $store[2];
 ?>
 <!DOCTYPE html>
 <html>
@@ -315,8 +328,8 @@ $up_url=($up_dir!=''&&$up_dir!='.')?'/'.rawurlencode($up_dir):'index.php';
     <script type="text/javascript">
     var _c1='#fefefe'; var _c2='#fafafa'; var _ppg=100000000000000; var _cpg=1; var _files=[]; var _dirs=[]; var _tpg=null; var _tsize=0; var _sort='date'; var _sdir={'type':0,'name':0,'size':0,'date':1}; var idx=null; var tbl=null;
     function _obj(s){return document.getElementById(s);}  //returns a dom element
-    function _ge(n){n=n.substr(n.lastIndexOf('.')+1);return n.toLowerCase();}
-    function _nf(n,p){if(p>=0){var t=Math.pow(10,p);return Math.round(n*t)/t;}}
+    function _ge(n){n=n.substr(n.lastIndexOf('.')+1);return n.toLowerCase();}   //identifies the file type
+    function _nf(n,p){if(p>=0){var t=Math.pow(10,p);return Math.round(n*t)/t;}}  //
     function _s(v,u){if(!u)u='B';if(v>1024&&u=='B')return _s(v/1024,'KB');if(v>1024&&u=='KB')return _s(v/1024,'MB');if(v>1024&&u=='MB')return _s(v/1024,'GB');return _nf(v,1)+'&nbsp;'+u;}
     function _f(name,size,date,url,rdate){_files[_files.length]={'dir':0,'name':name,'size':size,'date':date,'type':_ge(name),'url':url,'rdate':rdate,'icon':'index.php?icon='+_ge(name)};_tsize+=size;}
     function _d(name,date,url){_dirs[_dirs.length]={'dir':1,'name':name,'date':date,'url':url,'icon':'index.php?icon=dir'};}
@@ -331,6 +344,7 @@ $up_url=($up_dir!=''&&$up_dir!='.')?'/'.rawurlencode($up_dir):'index.php';
     function _head()
     {
         if(!idx)return;
+        console.log("_head() is executed");
         _tpg=Math.ceil((_files.length+_dirs.length)/_ppg);
         idx.innerHTML='<div class="rounded gray" style="padding:5px 10px 5px 7px;color:#202020">' +
             '<div class="row pb-2 float-left"><label class="cont" style="margin-left: 4px"><span><input type="checkbox" class="controlling" /><span class="checkmark"></span></span></label><span><div class="ui dropdown simple" style="margin-left: 15px;"><div style="" class="text"><strong>Actions</strong></div><i class="dropdown icon" style="margin-left: 5px;"></i><div class="menu"><div class="item action-file"><i class="upload icon"></i><strong>File Upload</strong></div><div class="item action-folder"><i class="folder icon"></i><strong>New Folder</strong></div><div class="item action-delete"><i class="trash alternate icon"></i><strong>Delete</strong></div><div class="item action-move"><i class="folder open icon"></i><strong>Move to Folder</strong></div><div class="item action-rename"><i class="pen square icon"></i><strong>Rename</strong></div></div></div><?=$dir!=''?'&nbsp; (<a href="'.$up_url.'">Back</a>)':''?></span></div>' +
@@ -346,7 +360,7 @@ $up_url=($up_dir!=''&&$up_dir!='.')?'/'.rawurlencode($up_dir):'index.php';
         //_tpg = 1;
         var _cnt=_dirs.concat(_files);if(!tbl)return;if(_cpg>_tpg){_cpg=_tpg;return;}else if(_cpg<1){_cpg=1;return;}var a=(_cpg-1)*_ppg;var b=_cpg*_ppg;var j=0;var html='';
         if(_tpg>1)html+='<p style="padding:5px 5px 0px 7px;color:#202020;text-align:right;"><span class="link" onmousedown="_pp();return false;">Previous</span> ('+_cpg+'/'+_tpg+') <span class="link" onmousedown="_np();return false;">Next</span></p>';
-        html+='<table cellspacing="0" cellpadding="5" border="0">';
+        html+='<table class="main-table" cellspacing="0" cellpadding="5" border="0">';
         for(var i=a;i<b&&i<(_dirs.length);++i)
         {
             var x = document.getElementById("content").getBoundingClientRect().width;
@@ -375,6 +389,7 @@ $up_url=($up_dir!=''&&$up_dir!='.')?'/'.rawurlencode($up_dir):'index.php';
     {
         idx=_obj('idx'); _head(); _srt('name');
         $(document).ready(function(){
+          //$(".main-table").remove(console.log("Succesfully emptied the element"));
           $(".controlling").click(function(){
             $(".filecheck,.dircheck").prop('checked', $(this).prop('checked'));
             if ($(".filecheck:checked").length + $(".dircheck:checked").length != 0)
@@ -388,7 +403,7 @@ $up_url=($up_dir!=''&&$up_dir!='.')?'/'.rawurlencode($up_dir):'index.php';
           })
           $(".action-rename").hide();
           $(".action-delete").hide();
-          console.log($(".filecheck").length + $(".dircheck").length);
+          //console.log($(".filecheck").length + $(".dircheck").length);
           var total_checks = $(".filecheck").length + $(".dircheck").length;
           $(".filecheck").change(function(){
             if ($(".filecheck:checked").length + $(".dircheck:checked").length != 0)
@@ -445,7 +460,7 @@ $up_url=($up_dir!=''&&$up_dir!='.')?'/'.rawurlencode($up_dir):'index.php';
               file_name = decodeURIComponent(file_name);
               var start = file_name.lastIndexOf(".");
               var end = file_name.length;
-              console.log(file_name);
+              //console.log(file_name);
               Swal.fire({
                 title: "Rename",
                 input: 'text',
@@ -497,11 +512,11 @@ $up_url=($up_dir!=''&&$up_dir!='.')?'/'.rawurlencode($up_dir):'index.php';
             {
               var path_name = $(".dircheck:checked").parent().children("a").attr("href");
               path_name = decodeURIComponent(path_name);
-              console.log(path_name);
+              //console.log(path_name);
               var split_name = path_name.split("/");
-              console.log(split_name);
+              //console.log(split_name);
               var dirname = split_name[split_name.length-2];
-              console.log(dirname);
+              //console.log(dirname);
               Swal.fire({
                 title: "Rename",
                 input: 'text',
@@ -551,20 +566,20 @@ $up_url=($up_dir!=''&&$up_dir!='.')?'/'.rawurlencode($up_dir):'index.php';
             }
           })
           $(".action-delete").click(function(){
-            var files_checked = [];
-            var dirs_checked = [];
-            var dir_paths = [];
+            files_checked = [];
+            dirs_checked = [];
+            dir_paths = [];
             $(".filecheck:checked").each(function(){
               files_checked.push(decodeURIComponent($(this).parent().children("a").attr("href")));
             });
-            console.log(files_checked);
+            //console.log(files_checked);
             $(".dircheck:checked").each(function(){
               dir_paths.push(decodeURIComponent($(this).parent().children("a").attr("href")));
               var temp_path = decodeURIComponent($(this).parent().children("a").attr("href"));
               var temp_name = temp_path.split("/");
               dirs_checked.push(temp_name[temp_name.length-2]);
             })
-            console.log(dirs_checked);
+            //console.log(dirs_checked);
             Swal.fire({
               title: "Confirm",
               text: "You are about to delete "+files_checked.length+" files and "+dirs_checked.length+" folders",
@@ -585,14 +600,19 @@ $up_url=($up_dir!=''&&$up_dir!='.')?'/'.rawurlencode($up_dir):'index.php';
                 .then(response => {
                   if (response == 1)
                   {
+                    console.log("Files and directories are deleted")
                     Swal.fire({
                       icon: "success",
                       title : "Confirmation",
                       text: "Selected files succesfully deleted"
                     })
-                    .then(response => {
-                      idx=_obj('idx'); _head(); _srt('name');
-                      _tb1();
+                    .then(() => {
+                      console.log("This part is running");
+                      _files = _files.filter(a => !files_checked.includes(a.name));
+                      _dirs = _dirs.filter(b => !dirs_checked.includes(b.name));
+                      console.log("No.of dirs: "+_dirs.length);
+                      console.log("No.of files: "+_files.length);
+                      setTimeout($("#idx_tbl").html(""), _tbl() , 1000);
                     })
                   }
                 })
@@ -757,11 +777,11 @@ $up_url=($up_dir!=''&&$up_dir!='.')?'/'.rawurlencode($up_dir):'index.php';
     function upload_function()
     {
       var files = document.getElementById("fileupload").files;
-      console.log(files.length);
+      //console.log(files.length);
       var number_of_files = files.length;
       for (i = 0; i < number_of_files; ++i)
       {
-        console.log(files[i].name);
+        //console.log(files[i].name);
       }
       if (number_of_files > 10)
       {
