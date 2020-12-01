@@ -622,7 +622,7 @@ $files = $store[2];
                 }
               })
             }
-            if ($(".dircheck:checked").length == 1)
+            else if ($(".dircheck:checked").length == 1)
             {
               var path_name = $(".dircheck:checked").parent().children("a").attr("href");
               path_name = decodeURIComponent(path_name);
