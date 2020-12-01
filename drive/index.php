@@ -664,6 +664,7 @@ $files = $store[2];
                           if (_dirs[i].name == dirname)
                           {
                             _dirs[i].name = value;
+                            _dirs[i].url = window.location.pathname+value;
                           }
                         }
                         $("#idx_tbl").html("");
