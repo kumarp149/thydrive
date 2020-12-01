@@ -622,7 +622,7 @@ $files = $store[2];
                 }
               })
             }
-            else if ($(".dircheck:checked").length == 1)
+            if ($(".dircheck:checked").length == 1)
             {
               var path_name = $(".dircheck:checked").parent().children("a").attr("href");
               path_name = decodeURIComponent(path_name);
@@ -664,7 +664,7 @@ $files = $store[2];
                           if (_dirs[i].name == dirname)
                           {
                             _dirs[i].name = value;
-                            _dirs[i].url = window.location.pathname+value;
+                            _dirs[i].url = window.location.pathname+value+"/";
                           }
                         }
                         $("#idx_tbl").html("");
