@@ -380,16 +380,7 @@ $files = $store[2];
             html+='<tr class="datarow" style="background-color:'+rc+'"><td class="firsttd"><label class="cont"><span><label>&nbsp;&nbsp;&nbsp;<img class="file-icon-class" src="'+f['icon']+'" alt="" /></label><input type="checkbox" class="filecheck"><span class="checkmark"></span>&nbsp;&nbsp<a data-type="file" class="navigation" href="'+f['url']+'"><span class="filenamespan">'+f['name']+'</span></a></label></span></td><td class="hide-download"><a href="'+f['url']+'" download>Download</a></td><td class="center hide2" style="width:50px;">'+(f['dir']?'':_s(f['size']))+'</td><td class="center hide1 date" style="width:70px;">'+f['date']+'</td></tr>';
         }
         tbl.innerHTML=html+'</table>';
-    }
-
-    <?php while(list(,$d)=each($dirs))print sprintf("_d('%s','%s','%s');\n",addslashes($d['name']),date($date,$d['date']),addslashes($d['url'])); ?>
-    <?php while(list(,$f)=each($files))print sprintf("_f('%s',%d,'%s','%s',%d);\n",addslashes($f['name']),$f['size'],date($date,$f['date']),addslashes($f['url']),$f['date']);?>
-
-    window.onload=function()
-    {
-        idx=_obj('idx'); _head(); _srt('name');
         $(document).ready(function(){
-          //$(".main-table").remove(console.log("Succesfully emptied the element"));
           $(".controlling").click(function(){
             $(".filecheck,.dircheck").prop('checked', $(this).prop('checked'));
             if ($(".filecheck:checked").length + $(".dircheck:checked").length != 0)
@@ -453,6 +444,80 @@ $files = $store[2];
               $(".action-rename").hide();
             }
           })
+        })
+    }
+
+    <?php while(list(,$d)=each($dirs))print sprintf("_d('%s','%s','%s');\n",addslashes($d['name']),date($date,$d['date']),addslashes($d['url'])); ?>
+    <?php while(list(,$f)=each($files))print sprintf("_f('%s',%d,'%s','%s',%d);\n",addslashes($f['name']),$f['size'],date($date,$f['date']),addslashes($f['url']),$f['date']);?>
+
+    window.onload=function()
+    {
+        idx=_obj('idx'); _head(); _srt('name');
+        $(document).ready(function(){
+          //$(".main-table").remove(console.log("Succesfully emptied the element"));
+          /*$(".controlling").click(function(){
+            $(".filecheck,.dircheck").prop('checked', $(this).prop('checked'));
+            if ($(".filecheck:checked").length + $(".dircheck:checked").length != 0)
+            {
+              $(".action-delete").show();
+            }
+            if ($(".filecheck:checked").length + $(".dircheck:checked").length == 0)
+            {
+              $(".action-delete").hide();
+            }
+          })
+          $(".action-rename").hide();
+          $(".action-delete").hide();
+          //console.log($(".filecheck").length + $(".dircheck").length);
+          var total_checks = $(".filecheck").length + $(".dircheck").length;
+          $(".filecheck").change(function file_check(){
+            if ($(".filecheck:checked").length + $(".dircheck:checked").length != 0)
+            {
+              $(".action-delete").show();
+            }
+            if ($(".filecheck:checked").length + $(".dircheck:checked").length == 0)
+            {
+              $(".action-delete").hide();
+            }
+            if ($(".filecheck:checked").length + $(".dircheck:checked").length == total_checks && total_checks != 0)
+            {
+              $(".controlling").prop("checked", true);
+            }
+            else if ($(".filecheck:checked").length + $(".dircheck:checked").length == 1)
+            {
+              $(".action-rename").show();
+              $(".controlling").prop("checked", false);
+            }
+            else if ($(".filecheck:checked").length + $(".dircheck:checked").length != total_checks)
+            {
+              $(".controlling").prop("checked", false);
+              $(".action-rename").hide();
+            }
+          });
+          $(".dircheck").change(function dir_check(){
+            if ($(".filecheck:checked").length + $(".dircheck:checked").length != 0)
+            {
+              $(".action-delete").show();
+            }
+            if ($(".filecheck:checked").length + $(".dircheck:checked").length == 0)
+            {
+              $(".action-delete").hide();
+            }
+            if ($(".filecheck:checked").length + $(".dircheck:checked").length == total_checks)
+            {
+              $(".controlling").prop("checked", true);
+            }
+            else if ($(".filecheck:checked").length + $(".dircheck:checked").length == 1)
+            {
+              $(".action-rename").show();
+              $(".controlling").prop("checked", false);
+            }
+            else if ($(".filecheck:checked").length + $(".dircheck:checked").length != total_checks)
+            {
+              $(".controlling").prop("checked", false);
+              $(".action-rename").hide();
+            }
+          })*/
           $(".action-rename").click(function(){
             if ($(".filecheck:checked").length == 1)
             {
@@ -709,11 +774,25 @@ $files = $store[2];
                       console.log("No.of dirs: "+_dirs.length);
                       console.log("No.of files: "+_files.length);
                       setTimeout($("#idx_tbl").html(""), _tbl() , 1000);
-                      $(".action-delete").hide();
+                      //$(".action-delete").hide();
                     })
                   }
                 })
               }
+            })
+          })
+          $(".action-folder").click(function(){
+            Swal.fire({
+              title : "New Folder",
+              input: 'text',
+              showCancelButton: true,
+              confirmButtonText: 'Create',
+              inputValidator: (value) => {
+                if (!value)
+                {
+                  return '<span class="swal_validation">Please Enter the Name</span>';
+                }
+              } 
             })
           })
         })
