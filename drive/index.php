@@ -331,8 +331,8 @@ $files = $store[2];
     function _ge(n){n=n.substr(n.lastIndexOf('.')+1);return n.toLowerCase();}   //identifies the file type
     function _nf(n,p){if(p>=0){var t=Math.pow(10,p);return Math.round(n*t)/t;}}  //
     function _s(v,u){if(!u)u='B';if(v>1024&&u=='B')return _s(v/1024,'KB');if(v>1024&&u=='KB')return _s(v/1024,'MB');if(v>1024&&u=='MB')return _s(v/1024,'GB');return _nf(v,1)+'&nbsp;'+u;}
-    function _f(name,size,date,url,rdate){_files[_files.length]={'dir':0,'name':name,'size':size,'date':date,'type':_ge(name),'url':url,'rdate':rdate,'icon':'index.php?icon='+_ge(name)};_tsize+=size;}
-    function _d(name,date,url){_dirs[_dirs.length]={'dir':1,'name':name,'date':date,'url':url,'icon':'index.php?icon=dir'};}
+    function _f(name,size,date,url,rdate){_files[_files.length]={'dir':0,'name':name,'size':size,'date':date,'type':_ge(name),'url':url,'rdate':rdate,'icon':'index.php?icon='+_ge(name)};_tsize+=size; console.log(url);}
+    function _d(name,date,url){_dirs[_dirs.length]={'dir':1,'name':name,'date':date,'url':url,'icon':'index.php?icon=dir'}; console.log(url);}
     function _np(){_cpg++;_tbl();}
     function _pp(){_cpg--;_tbl();}
     function _sa(l,r){return(l['size']==r['size'])?0:(l['size']>r['size']?1:-1);} //sorting based on size
@@ -405,7 +405,7 @@ $files = $store[2];
           $(".action-delete").hide();
           //console.log($(".filecheck").length + $(".dircheck").length);
           var total_checks = $(".filecheck").length + $(".dircheck").length;
-          $(".filecheck").change(function(){
+          $(".filecheck").change(function file_check(){
             if ($(".filecheck:checked").length + $(".dircheck:checked").length != 0)
             {
               $(".action-delete").show();
@@ -429,7 +429,7 @@ $files = $store[2];
               $(".action-rename").hide();
             }
           });
-          $(".dircheck").change(function(){
+          $(".dircheck").change(function dir_check(){
             if ($(".filecheck:checked").length + $(".dircheck:checked").length != 0)
             {
               $(".action-delete").show();
@@ -489,7 +489,20 @@ $files = $store[2];
                     .then(response => {
                       if (response == 1)
                       {
-                        location.reload();
+                        for (i = 0; i < _files.length; ++i)
+                        {
+                          if (_files[i].name == file_name)
+                          {
+                            _files[i].name = value;
+                            _files[i].url = value;
+                            _files[i].icon = 'index.php?icon='+_ge(value);
+                          }
+                        }
+                        $("#idx_tbl").html("");
+                        _files.sort(_sd)
+                        _tbl();
+                        //file_check();
+                        return;
                       }
                       else if (response == "Exists")
                       {
@@ -502,6 +515,42 @@ $files = $store[2];
                       else if (response == "Large")
                       {
                         Swal.showValidationMessage("<span class='swal_validation'>Must contain less than 20 characters</span>");
+                      }
+                      else if (response == "Backward Slash")
+                      {
+                        Swal.showValidationMessage("<span class='swal_validation'>Name should not contain backward slash \"\\\"</span>");
+                      }
+                      else if (response == "Forward Slash")
+                      {
+                        Swal.showValidationMessage("<span class='swal_validation'>Name should not contain forward slash \"/\"</span>");
+                      }
+                      else if (response == "Star")
+                      {
+                        Swal.showValidationMessage("<span class='swal_validation'>Name should not contain star \"*\"</span>");
+                      }
+                      else if (response == "Question")
+                      {
+                        Swal.showValidationMessage("<span class='swal_validation'>Name should not contain question mark \"?\"</span>");
+                      }
+                      else if (response == "Line")
+                      {
+                        Swal.showValidationMessage("<span class='swal_validation'>Name should not contain \"|\"</span>");
+                      }
+                      else if (response == "<")
+                      {
+                        Swal.showValidationMessage("<span class='swal_validation'>Name should not contain \"<\"</span>");
+                      }
+                      else if (response == ">")
+                      {
+                        Swal.showValidationMessage("<span class='swal_validation'>Name should not contain \">\"</span>");
+                      }
+                      else if (response == ":")
+                      {
+                        Swal.showValidationMessage("<span class='swal_validation'>Name should not contain \":\"</span>");
+                      }
+                      else if (response == "colon")
+                      {
+                        Swal.showValidationMessage("<span class='swal_validation'>Name should not contain \"\</span>");
                       }
                     })
                   }
@@ -545,7 +594,18 @@ $files = $store[2];
                     .then(response => {
                       if (response == 1)
                       {
-                        location.reload();
+                        for (i = 0; i < _dirs.length; ++i)
+                        {
+                          if (_dirs[i].name == dirname)
+                          {
+                            _dirs[i].name = value;
+                          }
+                        }
+                        $("#idx_tbl").html("");
+                        _dirs.sort(_sd);
+                        _tbl();
+                        console.log("Rename succesfully hidden");
+                        console.log("Rename1 succesfully hidden");
                       }
                       else if (response == "Exists")
                       {
@@ -558,6 +618,42 @@ $files = $store[2];
                       else if (response == "Large")
                       {
                         Swal.showValidationMessage("<span class='swal_validation'>Must contain less than 19 characters</span>");
+                      }
+                      else if (response == "Backward Slash")
+                      {
+                        Swal.showValidationMessage("<span class='swal_validation'>Name should not contain backward slash \"\\\"</span>");
+                      }
+                      else if (response == "Forward Slash")
+                      {
+                        Swal.showValidationMessage("<span class='swal_validation'>Name should not contain forward slash \"/\"</span>");
+                      }
+                      else if (response == "Star")
+                      {
+                        Swal.showValidationMessage("<span class='swal_validation'>Name should not contain star \"*\"</span>");
+                      }
+                      else if (response == "Question")
+                      {
+                        Swal.showValidationMessage("<span class='swal_validation'>Name should not contain question mark \"?\"</span>");
+                      }
+                      else if (response == "Line")
+                      {
+                        Swal.showValidationMessage("<span class='swal_validation'>Name should not contain \"|\"</span>");
+                      }
+                      else if (response == "<")
+                      {
+                        Swal.showValidationMessage("<span class='swal_validation'>Name should not contain \"<\"</span>");
+                      }
+                      else if (response == ">")
+                      {
+                        Swal.showValidationMessage("<span class='swal_validation'>Name should not contain \">\"</span>");
+                      }
+                      else if (response == ":")
+                      {
+                        Swal.showValidationMessage("<span class='swal_validation'>Name should not contain \":\"</span>");
+                      }
+                      else if (response == "colon")
+                      {
+                        Swal.showValidationMessage("<span class='swal_validation'>Name should not contain \"\</span>");
                       }
                     })
                   }
@@ -613,6 +709,7 @@ $files = $store[2];
                       console.log("No.of dirs: "+_dirs.length);
                       console.log("No.of files: "+_files.length);
                       setTimeout($("#idx_tbl").html(""), _tbl() , 1000);
+                      $(".action-delete").hide();
                     })
                   }
                 })
