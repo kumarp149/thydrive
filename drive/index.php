@@ -455,7 +455,7 @@ $files = $store[2];
         idx=_obj('idx'); _head(); _srt('name');
         $(document).ready(function(){
           //$(".main-table").remove(console.log("Succesfully emptied the element"));
-          /*$(".controlling").click(function(){
+          $(".controlling").click(function(){
             $(".filecheck,.dircheck").prop('checked', $(this).prop('checked'));
             if ($(".filecheck:checked").length + $(".dircheck:checked").length != 0)
             {
@@ -517,7 +517,7 @@ $files = $store[2];
               $(".controlling").prop("checked", false);
               $(".action-rename").hide();
             }
-          })*/
+          })
           $(".action-rename").click(function(){
             if ($(".filecheck:checked").length == 1)
             {
