@@ -361,6 +361,8 @@ $files = $store[2];
         var _cnt=_dirs.concat(_files);if(!tbl)return;if(_cpg>_tpg){_cpg=_tpg;return;}else if(_cpg<1){_cpg=1;return;}var a=(_cpg-1)*_ppg;var b=_cpg*_ppg;var j=0;var html='';
         if(_tpg>1)html+='<p style="padding:5px 5px 0px 7px;color:#202020;text-align:right;"><span class="link" onmousedown="_pp();return false;">Previous</span> ('+_cpg+'/'+_tpg+') <span class="link" onmousedown="_np();return false;">Next</span></p>';
         html+='<table class="main-table" cellspacing="0" cellpadding="5" border="0">';
+        if (_dirs.length != 0)
+        {
         for(var i=a;i<b&&i<(_dirs.length);++i)
         {
             var x = document.getElementById("content").getBoundingClientRect().width;
@@ -372,6 +374,11 @@ $files = $store[2];
             }
             html+='<tr class="datarow" style="background-color:'+rc+'"><td class="firsttd"><label class="cont"><span><label>&nbsp;&nbsp;&nbsp;<img class="file-icon-class" src="'+f['icon']+'" alt="" /></label><input type="checkbox" class="dircheck"><span class="checkmark"></span>&nbsp;&nbsp<a data-type="directory" class="navigation" href="'+f['url']+'"><span class="filenamespan">'+f['name']+'</span></a></label></span></td><td class="hide-download"><a></a></td><td class="center hide2" style="width:50px;">'+(f['dir']?'':_s(f['size']))+'</td><td class="center hide1" style="width:70px;">'+f['date']+'</td></tr>';
             c = _dirs.length;
+        }
+      }
+        else
+        {
+          c = 0;
         }
         for(var i=c;i<b&&i<(_files.length+_dirs.length);++i)
         {
