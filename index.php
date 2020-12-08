@@ -1,110 +1,112 @@
 <?php
 
 session_start();
-if (isset($_SESSION['emailid']) && isset($_SESSION['pwdentered'])){
-/*?>
-  <script type="text/javascript">      
-    window.location.href = "http://mathlearn.icu/drive";
-  </script>
-<?php*/
+
+include('req_functions.php');
+
+function valid_session()
+{
+  if (isset($_SESSION['emailid']) && isset($_SESSION['pwdentered']))
+  {
+    $server = 'localhost';
+    $username = 'sruteeshP';
+    $password = '32175690Pq';
+    $ses_email = $_SESSION['emailid'];
+    $ses_pwd = $_SESSION['pwdentered'];
+    $conn = new mysqli($server,$username,$password,"logindata");
+    $sql = "SELECT Emailid, Password, Crypt FROM logininfo";
+    $result = $conn->query($sql);
+    while ($row = $result->fetch_assoc())
+    {
+        if (my_decrypt($row['Emailid'],$row['Crypt']) == $ses_email && my_decrypt($row['Password'],$row['Crypt']) == $ses_pwd)
+        {
+            return 1;
+        }
+    }
+    return 0;
+  }
+  else
+  {
+    return 0;
+  }
+}
+
+if (valid_session() == 1)
+{
   header('Location: http://mathlearn.icu/drive/files/0');
   die();
 }
 
-unset($_SESSION['code']);
-unset($_SESSION['email']);
-unset($_SESSION['pwdentered']);
-unset($_SESSION['emailid']);
-
-function randstring($length){                      //Used to generate sessionid
-  $char = 'acegikmoqsuwyBDFHJLNPRTVXZ';
-  for ($i = 0; $i < $length; ++$i){
-    $string .= $char[rand(0,26)];
+foreach ($_SESSION as $key => $val)
+{
+  if ($key != 'noemail' && $key != 'id')
+  {
+    unset($_SESSION[$key]);
   }
-  return $string;
 }
 
 
-if (! isset($_SESSION['id'])){                    //if sessionid is not set, generate it
+if (! isset($_SESSION['id']))
+{                   
   $_SESSION['id'] = randstring(20);
   $id = $_SESSION['id'];
 }
-if ($_GET['id'] != $_SESSION['id']){
-  header('Location: http://mathlearn.icu?email&service=login&domain=mathlearn.icu&redirect_to_page=password&id='.$_SESSION['id'].'');
-  exit();
-}
-if ($_GET['redirect_to_page'] != "password"){
-  header('Location: http://mathlearn.icu?email&service=login&domain=mathlearn.icu&redirect_to_page=password&id='.$_SESSION['id'].'');
-  exit();
-}
-if ($_GET['service'] != "login"){
-  header('Location: http://mathlearn.icu?email&service=login&domain=mathlearn.icu&redirect_to_page=password&id='.$_SESSION['id'].'');
-  exit();
-}
-if ($_GET['domain'] != "mathlearn.icu"){
-  header('Location: http://mathlearn.icu?email&service=login&domain=mathlearn.icu&redirect_to_page=password&id='.$_SESSION['id'].'');
-  exit();
-}
-
-
-function clean_text($string)                          //removes trailing spaces
+if ($_GET['id'] != $_SESSION['id'])
 {
- $string = trim($string);
- $string = stripslashes($string);
- $string = htmlspecialchars($string);
- $string = strtolower($string);
- return $string;
+  header('Location: http://mathlearn.icu?email&service=login&domain=mathlearn.icu&redirect_to_page=password&id='.$_SESSION['id'].'');
+  exit();
 }
-
-function my_encrypt($data, $key) {                    //Encrypting a string with a key
-    $encryption_key = base64_decode($key);
-    $iv = openssl_random_pseudo_bytes(openssl_cipher_iv_length('aes-256-cbc'));
-    $encrypted = openssl_encrypt($data, 'aes-256-cbc', $encryption_key, 0, $iv);
-    return base64_encode($encrypted . '::' . $iv);
+if ($_GET['redirect_to_page'] != "password")
+{
+  header('Location: http://mathlearn.icu?email&service=login&domain=mathlearn.icu&redirect_to_page=password&id='.$_SESSION['id'].'');
+  exit();
 }
-
-function my_decrypt($data, $key) {            //Decrypting the encrypted string with the encryption key
-    $encryption_key = base64_decode($key);
-    list($encrypted_data, $iv) = explode('::', base64_decode($data), 2);
-    return openssl_decrypt($encrypted_data, 'aes-256-cbc', $encryption_key, 0, $iv);
+if ($_GET['service'] != "login")
+{
+  header('Location: http://mathlearn.icu?email&service=login&domain=mathlearn.icu&redirect_to_page=password&id='.$_SESSION['id'].'');
+  exit();
+}
+if ($_GET['domain'] != "mathlearn.icu")
+{
+  header('Location: http://mathlearn.icu?email&service=login&domain=mathlearn.icu&redirect_to_page=password&id='.$_SESSION['id'].'');
+  exit();
 }
 
 
 if (isset($_POST['submit'])){
   $count = 0;
-  $email = clean_text($_POST['email']);
-  $conn = new mysqli('localhost','sruteeshP','32175690Pq','logindata');
+  $email = clean_mail($_POST['email']);
+  $conn = new mysqli($sql_server,$sql_username,$sql_password,'logindata');
   $sql = "SELECT EmailId, Password, Crypt FROM logininfo";
   $result = $conn->query($sql);
-  if ($result->num_rows > 0){
-    while ($row = $result->fetch_assoc()){
-      if (my_decrypt($row['EmailId'],$row['Crypt']) == $email){
-        $conn->close();
-        $count = $count + 1;
-        session_start();
-        $_SESSION['email'] = $email;
+    while ($row = $result->fetch_assoc())
+    {
+      if (my_decrypt($row['EmailId'],$row['Crypt']) == $email)
+      {
+        $count = 1;
+        $_SESSION['emailid'] = $email;
         break;
-        die();
       }
     }
+  if ($count == 1)
+  {
+    $conn->close();
+    unset($_SESSION['code']);
+    header('Location: http://mathlearn.icu/password.php');
+    die();
   }
-  if ($count > 0){
-    header('Location: http://mathlearn.icu/password1.php');
-    exit();
-  }
-  if ($count == 0){
-    session_start();
+  if ($count == 0)
+  {
     $_SESSION['noemail'] = "No account found";
     header('Location: http://mathlearn.icu?email&service=login&domain=mathlearn.icu&redirect_to_page=password&id='.$_SESSION['id'].'');
     die();
   }
 }
 
-if (array_key_exists('createaccount', $_POST)){
-  session_start();
-  $_SESSION['creating'] = "Yes";
+if (array_key_exists('createaccount', $_POST))
+{
   header('Location: create-account.php?details&service=signup&redirect_to_page=email_confirmation&id='.$_SESSION['id']);
-  exit();
+  die();
 }
 
 ?>
@@ -123,8 +125,6 @@ if (array_key_exists('createaccount', $_POST)){
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
   <script data-ad-client="ca-pub-4991407935211785" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
   <style>
-  #container-primary{
-  }
   #container-secondary{
     text-align: center;
   }
@@ -138,8 +138,6 @@ if (array_key_exists('createaccount', $_POST)){
     font-size: 16.5px;
     padding-top: 1px;
     padding-bottom: 1px;
-  }
-  #email-form{
   }
   #email-error-container{
     font-size: 19px;
@@ -160,14 +158,14 @@ if (array_key_exists('createaccount', $_POST)){
 </head>
 <body>
   <div class="container mt-5 pt-2 pb-4" id="container-primary">
-    <div class="container mt-3" id="container-secondary"><h3>Welcome</h3><br> Please Enter your <strong><label for="email">Email</label></strong> to continue</br>
+    <div class="container mt-3" id="container-secondary"><h3>Welcome</h3><br> Please Enter your <strong><label for="email">Email</label></strong> to <strong>LOGIN</strong></br>
     </div>
     <div class="container pt-2" id="container-tertiary">
       <form method="post" id="email-form" autocomplete="off">
           <input type="text" class="form-control mx-auto" id="email" placeholder="Email" name="email" spellcheck="false"></input>
         <div class="container" id="email-error-container"><?php
-        session_start();
-        if (isset($_SESSION['noemail'])){
+        if (isset($_SESSION['noemail']))
+        {
           echo $_SESSION['noemail'];
           unset($_SESSION['noemail']);
         } ?>

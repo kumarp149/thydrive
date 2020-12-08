@@ -1,121 +1,88 @@
 <?php
 
+//ini_set('display_errors', 1);
+//ini_set('display_startup_errors', 1);
+//error_reporting(E_ALL);
 
-//conditions start
-function randid($length){
-  $char = 'acegikmoqsuwyBDFHJLNPRTVXZ';
-  $string = '';
-  for ($i = 0; $i < $length; ++$i){
-    $string .= $char[rand(0,26)];
-  }
-  return $string;
-}
+include('req_functions.php');
+
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
+
 require 'vendor/autoload.php';
+
 session_start();
-unset($_SESSION['expired']);
-unset($_SESSION['code_error_times']);
-unset($_SESSION['many_times']);
-unset($_SESSION['code']);
-setcookie("emailid");
-if (isset($_SESSION['id'])){
+
+function valid_session()
+{
+  if (isset($_SESSION['emailid']) && isset($_SESSION['pwdentered']))
+  {
+    $server = 'localhost';
+    $username = 'sruteeshP';
+    $password = '32175690Pq';
+    $ses_email = $_SESSION['emailid'];
+    $ses_pwd = $_SESSION['pwdentered'];
+    $conn = new mysqli($server,$username,$password,"logindata");
+    $sql = "SELECT Emailid, Password, Crypt FROM logininfo";
+    $result = $conn->query($sql);
+    while ($row = $result->fetch_assoc())
+    {
+        if (my_decrypt($row['Emailid'],$row['Crypt']) == $ses_email && my_decrypt($row['Password'],$row['Crypt']) == $ses_pwd)
+        {
+            return 1;
+        }
+    }
+    return 0;
+  }
+  else
+  {
+    return 0;
+  }
+}
+
+if (valid_session() == 1)
+{
+  header('Location: http://mathlearn.icu/drive/files/0');
+  die();
+}
+
+if (isset($_SESSION['id']))
+{
 
 }
-else{
+else
+{
   $_SESSION['id'] = randid(20);
 }
-if ($_GET['service'] != 'signup'){
-  header('Location: create-account.php?details&service=signup&redirect_to_page=email_confirmation&id='.$_SESSION['id']);
-  exit();
-}
-if ($_GET['redirect_to_page'] != 'email_confirmation'){
-  header('Location: create-account.php?details&service=signup&redirect_to_page=email_confirmation&id='.$_SESSION['id']);
-  exit();
-}
-if ($_GET['id'] != $_SESSION['id']){
-  header('Location: create-account.php?details&service=signup&redirect_to_page=email_confirmation&id='.$_SESSION['id']);
-}
-//conditions end
-
-
-//User-defined functions start
-function otp_gen($length){
-  $num_code = "18230846765630778590";
-  $otp = '';
-  for ($i = 0; $i < $length; ++$i){
-    $otp .= $num_code[mt_rand(0,strlen($num_code)-1)];
-  }
-  return $otp;
-}
-function randstring($length){            //Generates Encryption Key
-  $string = '';
-  $char = '8A1+aBb&C2=cD#8dEe3F@fGg-3HhIi=4#JjK+k@5LlM8mNn5&O6oP+6pQqR=7@rS8s#Tt7Uu&9Vv-7Ww+0XxY7yZz';
-  for ($i = 0; $i < $length; ++$i){
-    $string .= $char[mt_rand(0,strlen($char)-1)];
-  }
-  return $string;
-}
-function clean_mail($string)             //Formats Email
+if ($_GET['service'] != 'signup')
 {
- $string = trim($string);
- $string = stripslashes($string);
- $string = htmlspecialchars($string);
- $string = strtolower($string);
- return $string;
+  header('Location: create-account.php?details&service=signup&redirect_to_page=email_confirmation&id='.$_SESSION['id']);
+  exit();
 }
-function clean_text($string){           //Formats text entered
-  $string = trim($string);
-  $string = stripslashes($string);
-  $string = htmlspecialchars($string);
-  return $string;
+if ($_GET['redirect_to_page'] != 'email_confirmation')
+{
+  header('Location: create-account.php?details&service=signup&redirect_to_page=email_confirmation&id='.$_SESSION['id']);
+  exit();
 }
-function my_encrypt($data, $key) {          //Encryption algorithm
-    $encryption_key = base64_decode($key);
-    $iv = openssl_random_pseudo_bytes(openssl_cipher_iv_length('aes-256-cbc'));
-    $encrypted = openssl_encrypt($data, 'aes-256-cbc', $encryption_key, 0, $iv);
-    return base64_encode($encrypted . '::' . $iv);
+if ($_GET['id'] != $_SESSION['id'])
+{
+  header('Location: create-account.php?details&service=signup&redirect_to_page=email_confirmation&id='.$_SESSION['id']);
 }
 
-function my_decrypt($data, $key) {        //Decryption algorithm
-    $encryption_key = base64_decode($key);
-    list($encrypted_data, $iv) = explode('::', base64_decode($data), 2);
-    return openssl_decrypt($encrypted_data, 'aes-256-cbc', $encryption_key, 0, $iv);
-}
-//User-defined functions end
 
-
-//form processing start
 if (isset($_POST['submit'])){
-  $gen_key = randstring(40);
-  $_SESSION['crypt'] = $gen_key;
-  //processing form-data start
-  $count = 0;
-  $fname = clean_text($_POST['firstname']);
-  $lname = clean_text($_POST['lastname']);
+  $gen_key = hash("sha256",randstring(3));
   $email = clean_mail($_POST['email']);
-  $password = $_POST['password'];
-  $fname_crypted = my_encrypt($fname,$gen_key);
-  $_SESSION['fname'] = $fname_crypted;
-  $lname_crypted = my_encrypt($lname,$gen_key);
-  $_SESSION['lname'] = $lname_crypted;
-  $email_crypted = my_encrypt($email,$gen_key);
-  $_SESSION['email_store'] = $email_crypted;
-  $password_crypted = my_encrypt($password,$gen_key);
-  $_SESSION['password'] = $password_crypted;
-  //processing form-data end
-
-
-  $conn = new mysqli("localhost","sruteeshP","32175690Pq","logindata");
-  if ($conn->connect_error){
-    die("Error connecting to database: ".$conn->connect_error);
-  }
+  $count = 0;
+  $conn = new mysqli($sql_server,$sql_username,$sql_password,"logindata");
   $sql = "SELECT EmailId, Crypt FROM logininfo";
   $result = $conn->query($sql);
-  while ($row = $result->fetch_assoc()){
-    if (my_decrypt($row['EmailId'],$row['Crypt']) == $email){
-      $count = $count + 1;
+  while ($row = $result->fetch_assoc())
+  {
+    if (my_decrypt($row['EmailId'],$row['Crypt']) == $email)
+    {
+      $count = 1;
       $_SESSION['firstname'] = $_POST['firstname'];
       $_SESSION['lastname'] = $_POST['lastname'];
       $_SESSION['emailid'] = $_POST['email'];
@@ -124,48 +91,56 @@ if (isset($_POST['submit'])){
       exit();
     }
   }
-  if ($count == 0){
+  if ($count == 0)
+  {
+    $_SESSION['crypt'] = $gen_key;
+    $_SESSION['fname_crypted'] = my_encrypt(clean_text($_POST['firstname']),$gen_key);
+    $_SESSION['lname_crypted'] = my_encrypt(clean_text($_POST['lastname']),$gen_key);
+    $_SESSION['email_crypted'] = my_encrypt(clean_mail($_POST['email']),$gen_key);
+    $_SESSION['password_crypted'] = my_encrypt(clean_text($_POST['password']),$gen_key);
+
+    $_SESSION['fname'] = clean_text($_POST['firstname']);
+    $_SESSION['lname'] = clean_text($_POST['lastname']);
+    $_SESSION['email'] = clean_mail($_POST['email']);       //no use of these variables as of now
+    $_SESSION['password'] = clean_text($_POST['password']);
+
+    $fname_crypted = $_SESSION['fname_crypted'];
+    $lname_crypted = $_SESSION['lname_crypted'];
+    $email_crypted = $_SESSION['email_crypted'];
+    $password_crypted = $_SESSION['password_crypted'];
     $sql_temp = "INSERT INTO `templogininfo` (FirstName, LastName, EmailId, Password, Crypt)
     VALUES ('$fname_crypted','$lname_crypted','$email_crypted','$password_crypted','$gen_key')";
-    session_start();
+    
     $_SESSION['create_time'] = time();
     $_SESSION['code_error'] = "To be seen";
     $code = otp_gen(6);
     $_SESSION['code'] = $code;
     $mail = new PHPMailer(true);
-    $mail->SMTPDebug = 0;                      // Enable verbose debug output
-    $mail->isSMTP();                                            // Send using SMTP
-    $mail->Host       = '******************';                    // Set the SMTP server to send through
-    $mail->SMTPAuth   = true;                                   // Enable SMTP authentication
-    $mail->Username   = '*****************';                     // SMTP username
-    $mail->Password   = '**************************';                               // SMTP password
-    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;         // Enable TLS encryption; `PHPMailer::ENCRYPTION_SMTPS` encouraged
-    $mail->Port       = 587;                                    // TCP port to connect to, use 465 for `PHPMailer::ENCRYPTION_SMTPS` above
+    $mail->SMTPDebug = 0;                      
+    $mail->isSMTP();                                            
+    $mail->Host       = $smtp_server;       
+    $mail->SMTPAuth   = true;                                   
+    $mail->Username   = $smtp_username;                  
+    $mail->Password   = $smtp_password;                               
+    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;         
+    $mail->Port       = 587;                                    
 
     //Recipients
-    $mail->setFrom('*****************', 'Sruteesh');
-    $mail->addAddress($email, $fname);     // Add a recipient
-  /*  $mail->addAddress('ellen@example.com');               // Name is optional
-    $mail->addReplyTo('info@example.com', 'Information');
-    $mail->addCC('cc@example.com');
-    $mail->addBCC('bcc@example.com');*/
-
-    // Attachments
-    /*$mail->addAttachment('/var/tmp/file.tar.gz');         // Add attachments
-    $mail->addAttachment('/tmp/image.jpg', 'new.jpg');*/    // Optional name
-
-    // Content
-    $mail->isHTML(true);                                  // Set email format to HTML
+    $mail->setFrom('sruteeshkumarp@gmail.com', 'Sruteesh');
+    $mail->addAddress($email, clean_text($_POST['firstname']));
+    $mail->isHTML(true);
     $mail->Subject = 'Verify your account';
     $mail->Body    = '<span style="font-size:17px;font-family:Helvetica">Hey '.$fname.',</span><br><br><span style="font-size:17.5px;font-family:Helvetica">It seems you have registered for Mathlearn. Please Confirm your account to continue</span><br><br><span style="font-size:17.5px;font-family:Helvetica">Enter the following code (valid for 15 minutes) when asked</span><br><br><div style="text-align:center"><span><b><h1>'.$code.'</h1><br><span style="font-family:Helvetica">**By Entering this code, you agree to our <a>terms and conditions</a></span></b></span></div><br><br><span style="font-size:17px;font-family:Helvetica">Alternatively, click the following button to activate your account</span><br><br><div style="text-align:center"><a href="http://buttons.cm" style="background-color:rgb(26, 115, 232);border:1px solid rgb(26, 115, 232);border-radius:3px;color:#ffffff;display:inline-block;font-family:sans-serif;font-size:16px;line-height:44px;text-align:center;text-decoration:none;width:140px;">Activate</a><br><br><span style="font-family:Helvetica"><b>**By clicking you agree to our <a>terms and comditions</b></span></div>';
     $mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
 
     $mail->send();
-    if ($conn->query($sql_temp) === TRUE){
-      header("Location: confirm-account.php");
+    if ($conn->query($sql_temp) === TRUE)
+    {
+      header("Location: confirm-account.php?verification&domain=mathlearn.icu&id=".$_SESSION['id']);
       die();
     }
-    else{
+    else
+    {
       echo "Data not added";
     }
   }
@@ -174,8 +149,7 @@ if (isset($_POST['submit'])){
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Create account
-  </title>
+  <title>Create account</title>
   <meta charset="utf-8">
   <meta name="description" content="Mathlearn SignUp page">
   <meta name="keywords" content="Mathlearn, SignUp">
@@ -198,8 +172,6 @@ if (isset($_POST['submit'])){
     #password,#cnfpassword{
       font-size: 13.5px;
     }
-    #signupform{
-    }
     #bigdiv{
       text-align: center;
     }
@@ -220,12 +192,6 @@ if (isset($_POST['submit'])){
     #formdiv2{
       width: 40%;
       min-width: 320px;
-    }
-    #fnamediv{
-      background-color:;
-    }
-    #lnamediv{
-      background-color: ;
     }
     #info{
       cursor: pointer;
@@ -257,16 +223,10 @@ if (isset($_POST['submit'])){
         margin-left: -17%;
       }
     }
-    @media screen and (min-width: 480px) {
-      #cnfpwddiv{
-        file_put_contentst-size: 15px;
-      }
-  }
   #container {
   position: absolute;
   top: 50%;
   margin-top: -200px;
-  /* half of #content height*/
   left: 0;
   width: 100%;
   z-index: 2;
@@ -285,7 +245,6 @@ if (isset($_POST['submit'])){
 </head>
 <body>
   <?php
-  session_start();
   if (isset($_SESSION['firstname'])){
     $firstname = $_SESSION['firstname'];
   }
@@ -305,11 +264,13 @@ if (isset($_POST['submit'])){
     <form method="post" id="signupform" class="pt-5" autocomplete="off">
       <div class="row mx-auto" id="formdiv">
         <input type="text" class="form-control col" spellcheck="false" autocomplete="off" id="firstname" placeholder="First Name" name="firstname" value = "<?php
-        if (isset($firstname)){
+        if (isset($firstname))
+        {
           echo $firstname;
           unset($_SESSION['firstname']);
         }?>"><input type="text" spellcheck="false" class="form-control col second" id="lastname" autocomplete="off" placeholder="Last Name" name="lastname" value = "<?php
-        if (isset($lastname)){
+        if (isset($lastname))
+        {
           echo $lastname;
           unset($_SESSION['lastname']);
         }?>">
@@ -322,7 +283,6 @@ if (isset($_POST['submit'])){
       </div>
       <div class="row mx-auto pt-1" id="formdiv">
         <div class="mx-auto col text-danger" id="emaildiv"><?php
-        session_start();
         if (isset($_SESSION['createerror']))
         {
           echo "<strong>**Account already exists with this Email</strong>";

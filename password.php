@@ -1,14 +1,46 @@
 <?php
 session_start();
-if (isset($_SESSION['emailid']) && isset($_SESSION['pwdentered'])){
+
+include('req_functions.php');
+
+function valid_session()
+{
+  if (isset($_SESSION['emailid']) && isset($_SESSION['pwdentered']))
+  {
+    $server = 'localhost';
+    $username = 'sruteeshP';
+    $password = '32175690Pq';
+    $ses_email = $_SESSION['emailid'];
+    $ses_pwd = $_SESSION['pwdentered'];
+    $conn = new mysqli($server,$username,$password,"logindata");
+    $sql = "SELECT Emailid, Password, Crypt FROM logininfo";
+    $result = $conn->query($sql);
+    while ($row = $result->fetch_assoc())
+    {
+        if (my_decrypt($row['Emailid'],$row['Crypt']) == $ses_email && my_decrypt($row['Password'],$row['Crypt']) == $ses_pwd)
+        {
+            return 1;
+        }
+    }
+    return 0;
+  }
+  else
+  {
+    return 0;
+  }
+}
+
+if (valid_session() == 1)
+{
   header('Location: http://mathlearn.icu/drive/files/0');
   exit();
 }
-$_SESSION['emailid'] = $_SESSION['email'];
-if (! isset($_SESSION['email'])){
-  header('Location: http://www.mathlearn.icu');
+
+if (! isset($_SESSION['emailid']))
+{
+  header('Location: http://mathlearn.icu/');
+  die();
 }
-unset($_SESSION['email']);
 
 ?>
 <!DOCTYPE html>
@@ -29,19 +61,12 @@ unset($_SESSION['email']);
     window.addEventListener('keydown',function(e){if(e.keyIdentifier=='U+000A'||e.keyIdentifier=='Enter'||e.keyCode==13){if(e.target.nodeName=='INPUT'&&e.target.type=='text'){e.preventDefault();return false;}}},true);
   </script>
   <style>
-  #container-primary{
-    background-color: ;
-  }
   #container-secondary{
-    background-color: ;
     text-align: center;
   }
   #container-tertiary{
-    background-color: ;
     text-align: center;
     margin-top: 30px;
-  }
-  #pwd-form{
   }
   #pwd{
     width: 40%;
@@ -52,7 +77,6 @@ unset($_SESSION['email']);
 
   }
   #pwd-error-container{
-    background-color: ;
     font-size: 19px;
     color: rgb(217, 48, 37);
     font-weight: bold;
@@ -67,43 +91,24 @@ unset($_SESSION['email']);
     opacity: 0.3;
     margin-top: 8%;
   }
-  #forgotpwd{
-
-  }
-  #submit-button{
-
-  }
-  #answer{
-    width: 40%;
-    min-width: 300px;
-    font-size: 18px;
-    padding-top: 1px;
-    padding-bottom: 1px;
-    margin-top: 1%;
-  }
   </style>
 </head>
 <body>
   <div class="container mt-5 pt-2 pb-4" id="container-primary">
-    <div class="container mt-3" id="container-secondary"><h3>Welcome</h3><br> Please Enter your <strong><label for="pwd">Password</label></strong> to view the question</br>
+    <div class="container mt-3" id="container-secondary"><h3>Welcome</h3><br> Please Enter your <strong><label for="pwd">Password</label></strong> to <strong>LOGIN</strong></br>
     </div>
     <div class="container pt-2" id="container-tertiary">
       <form method="post" id="pwd-form" autocomplete="off">
         <input type="password" class="form-control mx-auto" id="pwd" placeholder="Password" name="pwd" spellcheck="false"></input>
-        <div class="container" id="pwd-error-container"><?php
-        session_start();
-        if (isset($_SESSION['wrongpwd'])){
-        echo $_SESSION['wrongpwd'];
-        unset($_SESSION['wrongpwd']);
-        } ?>
+        <div class="container" id="pwd-error-container">
         </div>
         <div class="container" id="button-container">
           <div class="row">
             <div class="mr-auto">
-              <input style="" type="submit" class="btn btn-info" id="forgotpwd" value="Forgot Password">
+              <input type="submit" class="btn btn-info" id="forgotpwd" value="Forgot Password">
             </div>
             <div class="">
-              <input style="" type="button" class="btn btn-info" id="submit-button" value="Validate" disabled>
+              <input type="button" class="btn btn-info" id="submit-button" value="Validate" disabled>
             </div>
           </div>
        </div>
@@ -112,78 +117,57 @@ unset($_SESSION['email']);
      </div>
     </div>
   <script>
-   $(document).ready(function(){
-     $("#answer").on('input',function(){
-       if (document.getElementById("answer").value != ""){
-         document.getElementById("final-submit-button").disabled = false;
-       }
-       else{
-         document.getElementById("final-submit-button").disabled = true;
-       }
-     })
+   $(document).ready(function()
+   {
      var count_load = 0;
      $("#pwd").focus();
      var x = document.getElementById("pwd");
-     $("#pwd").on('input',function(){
-       if (x.value == ""){
+     $("#pwd").on('input',function()
+     {
+       if (x.value == "")
+       {
          document.getElementById("submit-button").disabled = true;
        }
-       else{
+       else
+       {
          document.getElementById("submit-button").disabled = false;
        }
      })
-     $("#submit-button").click(function(){
+     $("#submit-button").click(function()
+     {
        count_load = count_load + 1;
        document.getElementById("pwd-error-container").innerHTML = "Authenticating ......";
        $("#pwd-error-container").css("color","black");
        var emailid = '<?php
-       session_start();
        echo $_SESSION['emailid'];
        ?>';
        var pwd = document.getElementById("pwd").value;
        $.post('pwd.php',{query_emailid : emailid, query_pwd : pwd}, function(data,status){
-         /*document.getElementById("submit-button").value = data;*/
          var jdata = JSON.parse(data);
-         if (jdata.success == 1){
-           /*document.getElementById("pwd-form").style.opacity = 0.3;
-           document.getElementById("pwd").readOnly = true;
-           document.getElementById("question-form").style.opacity = 1;
-           document.getElementById("forgotanswer").disabled = false;
-           document.getElementById("answer").readOnly = false;
-           $("#answer").focus();
-           document.title = "Login : Question";*/
-           setTimeout(function(){
+         if (jdata.success == 1)
+         {
+           setTimeout(function()
+           {
             document.getElementById("pwd-error-container").innerHTML = "Logging in....";
-             var userkey = '<?php session_start();
+             var userkey = '<?php
              echo $_SESSION['userkey']; ?>';
              window.location.href = "http://mathlearn.icu/drive/files/0";
            },1000)
          }
-         else{
-          setTimeout(function(){
+         else
+         {
+          setTimeout(function()
+          {
             $("#pwd-error-container").css("color","#dc3545");
            document.getElementById("pwd-error-container").innerHTML = "Wrong password";
            document.getElementById("pwd").value = "";
            },500)
          }
-         setTimeout(function(){
+         setTimeout(function()
+         {
            $("#pwd-error-container").empty();
          },1500);
        })
-       /*$.ajax({
-         url : "pwd.php",
-         type : "get",
-         data : { query_emailid : emailid, query_pwd : pwd },
-         success : function(response){
-           var jdata = JSON.parse(response);
-           if (jdata.success == 1){
-
-           }
-           else{
-             document.getElementById("submit-button").value = "Not found";
-           }
-         }
-       })*/
      });
      $(document).keypress(function(event){
        if (event.which == '13'){
