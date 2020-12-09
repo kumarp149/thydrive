@@ -6,6 +6,8 @@ require 'vendor/autoload.php';
 
 use Google\Cloud\Storage\StorageClient;
 
+$domain = "https://sruteesh.herokuapp.com";
+
 $mongo_url = 'mongodb+srv://sruteeshP:32175690P@cluster0.jwcwc.gcp.mongodb.net/<dbname>?retryWrites=true&w=majority';
 
 $sql_username = 'sruteeshP';

@@ -44,7 +44,7 @@ function valid_session()
 
 if (valid_session() == 1)
 {
-  header('Location: http://mathlearn.icu/drive/files/0');
+  header('Location: '.$domain.'/drive/files/0');
   die();
 }
 
@@ -114,7 +114,7 @@ if (isset($_POST['cnfaccount']))
         'keyFile' => json_decode(file_get_contents('key.json'), true)
       ]);
       $bucket = $storage->createBucket("thydrive");*/
-      header('Location: http://mathlearn.icu/encryption.php?encryption&id='.$_SESSION['id']);
+      header('Location: '.$domain.'/encryption.php?encryption&id='.$_SESSION['id']);
       die();
     }
     else
@@ -228,7 +228,7 @@ if (isset($_POST['cnfaccount']))
         $("#button-container").hide();
         $("#cnfaccount").prop('disabled', true);
         setTimeout(function(){
-          window.location.href = "http://mathlearn.icu";
+          window.location.href = "https://sruteesh.herokuapp.com";
         },1000);
       }
       $("#code").focus();

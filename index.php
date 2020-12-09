@@ -1,8 +1,8 @@
 <?php
 
-ini_set('display_errors', 1);
+/*ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
+error_reporting(E_ALL);*/
 
 session_start();
 
@@ -37,7 +37,7 @@ function valid_session()
 
 if (valid_session() == 1)
 {
-  header('Location: http://mathlearn.icu/drive/files/0');
+  header('Location: '.$domain.'/drive/files/0');
   die();
 }
 
@@ -57,22 +57,22 @@ if (! isset($_SESSION['id']))
 }
 if ($_GET['id'] != $_SESSION['id'])
 {
-  header('Location: http://mathlearn.icu?email&service=login&domain=mathlearn.icu&redirect_to_page=password&id='.$_SESSION['id'].'');
+  header('Location: '.$domain.'?email&service=login&domain=mathlearn.icu&redirect_to_page=password&id='.$_SESSION['id'].'');
   exit();
 }
 if ($_GET['redirect_to_page'] != "password")
 {
-  header('Location: http://mathlearn.icu?email&service=login&domain=mathlearn.icu&redirect_to_page=password&id='.$_SESSION['id'].'');
+  header('Location: '.$domain.'?email&service=login&domain=mathlearn.icu&redirect_to_page=password&id='.$_SESSION['id'].'');
   exit();
 }
 if ($_GET['service'] != "login")
 {
-  header('Location: http://mathlearn.icu?email&service=login&domain=mathlearn.icu&redirect_to_page=password&id='.$_SESSION['id'].'');
+  header('Location: '.$domain.'?email&service=login&domain=mathlearn.icu&redirect_to_page=password&id='.$_SESSION['id'].'');
   exit();
 }
 if ($_GET['domain'] != "mathlearn.icu")
 {
-  header('Location: http://mathlearn.icu?email&service=login&domain=mathlearn.icu&redirect_to_page=password&id='.$_SESSION['id'].'');
+  header('Location: '.$domain.'?email&service=login&domain=mathlearn.icu&redirect_to_page=password&id='.$_SESSION['id'].'');
   exit();
 }
 
@@ -96,13 +96,13 @@ if (isset($_POST['submit'])){
   {
     $conn->close();
     unset($_SESSION['code']);
-    header('Location: http://mathlearn.icu/password.php');
+    header('Location: '.$domain.'/password.php');
     die();
   }
   if ($count == 0)
   {
     $_SESSION['noemail'] = "No account found";
-    header('Location: http://mathlearn.icu?email&service=login&domain=mathlearn.icu&redirect_to_page=password&id='.$_SESSION['id'].'');
+    header('Location: '.$domain.'?email&service=login&domain=mathlearn.icu&redirect_to_page=password&id='.$_SESSION['id'].'');
     die();
   }
 }

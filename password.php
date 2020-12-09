@@ -32,13 +32,13 @@ function valid_session()
 
 if (valid_session() == 1)
 {
-  header('Location: http://mathlearn.icu/drive/files/0');
+  header('Location: '.$domain.'/drive/files/0');
   exit();
 }
 
 if (! isset($_SESSION['emailid']))
 {
-  header('Location: http://mathlearn.icu/');
+  header('Location: '.$domain);
   die();
 }
 
@@ -151,7 +151,7 @@ if (! isset($_SESSION['emailid']))
             document.getElementById("pwd-error-container").innerHTML = "Logging in....";
              var userkey = '<?php
              echo $_SESSION['userkey']; ?>';
-             window.location.href = "http://mathlearn.icu/drive/files/0";
+             window.location.href = "https://sruteesh.herokuapp.com/drive/files/0";
            },1000)
          }
          else

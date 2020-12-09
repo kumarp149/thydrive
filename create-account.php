@@ -43,7 +43,7 @@ function valid_session()
 
 if (valid_session() == 1)
 {
-  header('Location: http://mathlearn.icu/drive/files/0');
+  header('Location: '.$domain.'/drive/files/0');
   die();
 }
 
