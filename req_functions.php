@@ -14,7 +14,7 @@ $sql_username = 'sruteeshP';
 
 $sql_password = '32175690Pq';
 
-$sql_server = 'localhost';
+$sql_server = '34.71.67.81';
 
 $smtp_server = 'smtp.gmail.com';
 
