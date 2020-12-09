@@ -83,6 +83,8 @@ if (isset($_POST['submit'])){
   $conn = new mysqli($sql_server,$sql_username,$sql_password,'logindata');
   $sql = "SELECT EmailId, Password, Crypt FROM logininfo";
   $result = $conn->query($sql);
+  if ($result->num_rows > 0)
+  {
     while ($row = $result->fetch_assoc())
     {
       if (my_decrypt($row['EmailId'],$row['Crypt']) == $email)
@@ -92,6 +94,7 @@ if (isset($_POST['submit'])){
         break;
       }
     }
+  }
   if ($count == 1)
   {
     $conn->close();
