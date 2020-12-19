@@ -6,7 +6,7 @@ error_reporting(E_ALL);
 
 use Google\Cloud\Storage\StorageClient;
 
-include('req_functions.php');
+include('important/php/req_functions.php');
 
 require 'vendor/autoload.php';
 

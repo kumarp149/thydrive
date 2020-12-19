@@ -6,7 +6,7 @@ error_reporting(E_ALL);
 
 session_start();
 
-include('req_functions.php');
+include('important/php/req_functions.php');
 
 function valid_session()
 {
