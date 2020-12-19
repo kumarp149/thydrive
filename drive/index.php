@@ -135,6 +135,16 @@ $files = $store[2];
   top: -3px;
   margin-left: 6px;
 }
+.copyright
+{
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  font-weight: bold;
+}
 .down
 {
   transform: rotate(45deg);
@@ -451,6 +461,10 @@ $files = $store[2];
               $(".action-rename").hide();
             }
           })
+          if ($(".filecheck").length + $(".dircheck").length == 0)
+          {
+            $("#idx").empty();
+          }
         })
     }
 
@@ -461,21 +475,45 @@ $files = $store[2];
     {
         idx=_obj('idx'); _head(); _srt('name');
         $(document).ready(function(){
-          //$(".main-table").remove(console.log("Succesfully emptied the element"));
+          if ($(".filecheck").length + $(".dircheck").length == 0)
+          {
+            $("#idx").empty();
+          }
+          if ($(".filecheck").length + $(".dircheck").length == 0)
+          {
+            $(".checkmark").hide();
+            $(".action-move").hide();
+          }
+          else if ($(".filecheck").length + $(".dircheck").length != 0)
+          {
+            $(".checkmark").show();
+          }
+          $(".action-rename").hide();
+          $(".action-delete").hide();
+          $(".action-move").hide();
           $(".controlling").click(function(){
             $(".filecheck,.dircheck").prop('checked', $(this).prop('checked'));
             if ($(".filecheck:checked").length + $(".dircheck:checked").length != 0)
             {
               $(".action-delete").show();
+              $(".action-move").show();
             }
             if ($(".filecheck:checked").length + $(".dircheck:checked").length == 0)
             {
               $(".action-delete").hide();
+              $(".action-move").hide();
+              $(".action-rename").hide();
+            }
+            if ($(".filecheck:checked").length + $(".dircheck:checked").length == 1)
+            {
+              $(".action-delete").show();
+              $(".action-move").show();
+              $(".action-rename").show();
             }
           })
           $(".action-rename").hide();
           $(".action-delete").hide();
-          //console.log($(".filecheck").length + $(".dircheck").length);
+          $(".action-move").hide();
           var total_checks = $(".filecheck").length + $(".dircheck").length;
           $(".filecheck").change(function file_check(){
             if ($(".filecheck:checked").length + $(".dircheck:checked").length != 0)
@@ -485,44 +523,61 @@ $files = $store[2];
             if ($(".filecheck:checked").length + $(".dircheck:checked").length == 0)
             {
               $(".action-delete").hide();
+              $(".action-rename").hide();
+              $(".action-move").hide();
             }
-            if ($(".filecheck:checked").length + $(".dircheck:checked").length == total_checks && total_checks != 0)
-            {
-              $(".controlling").prop("checked", true);
-            }
-            else if ($(".filecheck:checked").length + $(".dircheck:checked").length == 1)
+            if ($(".filecheck:checked").length + $(".dircheck:checked").length == 1 && total_checks == 1)
             {
               $(".action-rename").show();
-              $(".controlling").prop("checked", false);
+              $(".action-delete").show();
+              $(".action-move").show();
+              $(".controlling").prop("checked", true);
             }
-            else if ($(".filecheck:checked").length + $(".dircheck:checked").length != total_checks)
+            if ($(".filecheck:checked").length + $(".dircheck:checked").length == 1 && total_checks > 1)
             {
-              $(".controlling").prop("checked", false);
-              $(".action-rename").hide();
+              $(".action-rename").show();
+              $(".action-delete").show();
+              $(".action-move").show();
+              $(".controlling").prop("checked",false);
+            }
+            if ($(".filecheck:checked").length + $(".dircheck:checked").length == total_checks)
+            {
+              $(".controlling").prop("checked", true);
+              $(".action-delete").show();
+              $(".action-move").show();
             }
           });
           $(".dircheck").change(function dir_check(){
             if ($(".filecheck:checked").length + $(".dircheck:checked").length != 0)
             {
               $(".action-delete").show();
+              $(".action-move").show();
             }
             if ($(".filecheck:checked").length + $(".dircheck:checked").length == 0)
             {
               $(".action-delete").hide();
+              $(".action-move").hide();
+              $(".action-rename").hide();
+            }
+            if ($(".filecheck:checked").length + $(".dircheck:checked").length == 1 && total_checks == 1)
+            {
+              $(".action-rename").show();
+              $(".action-delete").show();
+              $(".action-move").show();
+              $(".controlling").prop("checked", true);
+            }
+            if ($(".filecheck:checked").length + $(".dircheck:checked").length == 1 && total_checks > 1)
+            {
+              $(".action-rename").show();
+              $(".action-delete").show();
+              $(".action-move").show();
+              $(".controlling").prop("checked", false);
             }
             if ($(".filecheck:checked").length + $(".dircheck:checked").length == total_checks)
             {
               $(".controlling").prop("checked", true);
-            }
-            else if ($(".filecheck:checked").length + $(".dircheck:checked").length == 1)
-            {
-              $(".action-rename").show();
-              $(".controlling").prop("checked", false);
-            }
-            else if ($(".filecheck:checked").length + $(".dircheck:checked").length != total_checks)
-            {
-              $(".controlling").prop("checked", false);
-              $(".action-rename").hide();
+              $(".action-delete").show();
+              $(".action-move").show();
             }
           })
           $(".action-rename").click(function(){
@@ -559,6 +614,7 @@ $files = $store[2];
                       data : {action: "rename", type: "file", initial_name: file_name, final_name: value}
                     })
                     .then(response => {
+                      console.log("Response is "+response);
                       if (response == 1)
                       {
                         for (i = 0; i < _files.length; ++i)
@@ -576,53 +632,21 @@ $files = $store[2];
                         //file_check();
                         return;
                       }
-                      else if (response == "Exists")
+                      else if (response == "EXISTS")
                       {
-                        Swal.showValidationMessage("<span class='swal_validation'>A file/folder already exist with this name")
+                        Swal.showValidationMessage("<span class='swal_validation text-danger'>A file/folder already exist with this name")
                       }
-                      else if (response == "Invalid")
+                      else if (response == "THYDRIVE")
                       {
-                        Swal.showValidationMessage("<span class='swal_validation'>Name should not contain <span style='color: red;'>thydrive</span></span>");
+                        Swal.showValidationMessage("<span class='swal_validation text-danger'>Name should not contain <span style='color: red;'>thydrive</span></span>");
                       }
-                      else if (response == "Large")
+                      else if (response == "LARGE")
                       {
-                        Swal.showValidationMessage("<span class='swal_validation'>Must contain less than 20 characters</span>");
+                        Swal.showValidationMessage("<span class='swal_validation text-danger'>Must contain less than 20 characters</span>");
                       }
-                      else if (response == "Backward Slash")
+                      else if (response == "INVALID")
                       {
-                        Swal.showValidationMessage("<span class='swal_validation'>Name should not contain backward slash \"\\\"</span>");
-                      }
-                      else if (response == "Forward Slash")
-                      {
-                        Swal.showValidationMessage("<span class='swal_validation'>Name should not contain forward slash \"/\"</span>");
-                      }
-                      else if (response == "Star")
-                      {
-                        Swal.showValidationMessage("<span class='swal_validation'>Name should not contain star \"*\"</span>");
-                      }
-                      else if (response == "Question")
-                      {
-                        Swal.showValidationMessage("<span class='swal_validation'>Name should not contain question mark \"?\"</span>");
-                      }
-                      else if (response == "Line")
-                      {
-                        Swal.showValidationMessage("<span class='swal_validation'>Name should not contain \"|\"</span>");
-                      }
-                      else if (response == "<")
-                      {
-                        Swal.showValidationMessage("<span class='swal_validation'>Name should not contain \"<\"</span>");
-                      }
-                      else if (response == ">")
-                      {
-                        Swal.showValidationMessage("<span class='swal_validation'>Name should not contain \">\"</span>");
-                      }
-                      else if (response == ":")
-                      {
-                        Swal.showValidationMessage("<span class='swal_validation'>Name should not contain \":\"</span>");
-                      }
-                      else if (response == "colon")
-                      {
-                        Swal.showValidationMessage("<span class='swal_validation'>Name should not contain \"\</span>");
+                        Swal.showValidationMessage("<span class='swal_validation text-danger'>Name should not contain any of \, /, *, ?, |, <, >, :, \"\</span>");
                       }
                     })
                   }
@@ -658,12 +682,14 @@ $files = $store[2];
                 preConfirm: (value) => {
                   if (value != "")
                   {
+                    console.log(value);
                     return $.ajax({
                       type : "get",
                       url : "http://localhost/drive/ajax_calls.php",
                       data : {action: "rename", type: "dir", initial_name: dirname, initial_path: path_name, final_name: value}
                     })
                     .then(response => {
+                      //console.log(response);
                       if (response == 1)
                       {
                         for (i = 0; i < _dirs.length; ++i)
@@ -680,53 +706,21 @@ $files = $store[2];
                         console.log("Rename succesfully hidden");
                         console.log("Rename1 succesfully hidden");
                       }
-                      else if (response == "Exists")
+                      else if (response == "EXISTS")
                       {
-                        Swal.showValidationMessage("<span class='swal_validation'>A file/folder already exist with this name")
+                        Swal.showValidationMessage("<span class='swal_validation text-danger'>A file/folder already exist with this name")
                       }
-                      else if (response == "Invalid")
+                      else if (response == "THYDRIVE")
                       {
-                        Swal.showValidationMessage("<span class='swal_validation'>Name should not contain <span style='color: red;'>thydrive</span></span>");
+                        Swal.showValidationMessage("<span class='swal_validation text-danger'>Name should not contain <span style='color: red;'>thydrive</span></span>");
                       }
-                      else if (response == "Large")
+                      else if (response == "LARGE")
                       {
-                        Swal.showValidationMessage("<span class='swal_validation'>Must contain less than 19 characters</span>");
+                        Swal.showValidationMessage("<span class='swal_validation text-danger'>Must contain less than 19 characters</span>");
                       }
-                      else if (response == "Backward Slash")
+                      else if (response == "INVALID")
                       {
-                        Swal.showValidationMessage("<span class='swal_validation'>Name should not contain backward slash \"\\\"</span>");
-                      }
-                      else if (response == "Forward Slash")
-                      {
-                        Swal.showValidationMessage("<span class='swal_validation'>Name should not contain forward slash \"/\"</span>");
-                      }
-                      else if (response == "Star")
-                      {
-                        Swal.showValidationMessage("<span class='swal_validation'>Name should not contain star \"*\"</span>");
-                      }
-                      else if (response == "Question")
-                      {
-                        Swal.showValidationMessage("<span class='swal_validation'>Name should not contain question mark \"?\"</span>");
-                      }
-                      else if (response == "Line")
-                      {
-                        Swal.showValidationMessage("<span class='swal_validation'>Name should not contain \"|\"</span>");
-                      }
-                      else if (response == "<")
-                      {
-                        Swal.showValidationMessage("<span class='swal_validation'>Name should not contain \"<\"</span>");
-                      }
-                      else if (response == ">")
-                      {
-                        Swal.showValidationMessage("<span class='swal_validation'>Name should not contain \">\"</span>");
-                      }
-                      else if (response == ":")
-                      {
-                        Swal.showValidationMessage("<span class='swal_validation'>Name should not contain \":\"</span>");
-                      }
-                      else if (response == "colon")
-                      {
-                        Swal.showValidationMessage("<span class='swal_validation'>Name should not contain \"\</span>");
+                        Swal.showValidationMessage("<span class='swal_validation text-danger'>Name should not contain any of \, /, *, ?, |, <, >, :, \"\</span>");
                       }
                     })
                   }

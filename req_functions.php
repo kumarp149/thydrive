@@ -5,15 +5,17 @@ require 'vendor/autoload.php';
 
 use Google\Cloud\Storage\StorageClient;
 
-$domain = "https://sruteesh.herokuapp.com";
+$domain = "http://mathlearn.icu";
 
 $mongo_url = 'mongodb+srv://sruteeshP:32175690P@cluster0.jwcwc.gcp.mongodb.net/<dbname>?retryWrites=true&w=majority';
+
+$sql_server_public = '34.71.67.81';
+
+$sql_server_private = '10.76.112.4';
 
 $sql_username = 'sruteeshP';
 
 $sql_password = '32175690Pq';
-
-$sql_server = '34.71.67.81';
 
 $smtp_server = 'smtp.gmail.com';
 

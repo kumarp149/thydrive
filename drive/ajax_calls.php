@@ -21,15 +21,23 @@ if ($_GET['action'] == "rename" && $_GET['type'] == "file")
         $str = strtolower($_GET['final_name']);
         if (strpos($str,"thydrive") !== false)
         {
-            echo "Invalid";
+            echo "THYDRIVE";
+            die();
+        }
+        else if (strpos($str,'\\') !== false || strpos($str,'/') !== false || strpos($str,'*') !== false || strpos($str,'?') !== false || strpos($str,'|') !== false || strpos($str,'<') !== false || strpos($str,'>') !== false || strpos($str,':') !== false || strpos($str,'"') !== false)
+        {
+            echo "INVALID";
+            die();
         }
         else if (strlen($_GET['final_name']) >= 20)
         {
-            echo "Large";
+            echo "LARGE";
+            die();
         }
         else if (file_exists($_GET['final_name']) == 1)
         {
-            echo "Exists";
+            echo "EXISTS";
+            die();
         }
         else if (file_exists($_GET['final_name']) == 0)
         {
@@ -49,20 +57,29 @@ else if ($_GET['action'] == "rename" && $_GET['type'] == "dir")
         $str = strtolower($_GET['final_name']);
         if (strpos($str,"thydrive") !== false)
         {
-            echo "Invalid";
+            echo "THYDRIVE";
+            die();
+        }
+        else if (strpos($str,'\\') !== false || strpos($str,'/') !== false || strpos($str,'*') !== false || strpos($str,'?') !== false || strpos($str,'|') !== false || strpos($str,'<') !== false || strpos($str,'>') !== false || strpos($str,':') !== false || strpos($str,'"') !== false)
+        {
+            echo "INVALID";
+            die();
         }
         else if (strlen($_GET['final_name']) >= 19)
         {
-            echo "Large";
+            echo "LARGE";
+            die();
         }
         else if (file_exists($_GET['final_name']) == 1)
         {
-            echo "Exists";
+            echo "EXISTS";
+            die();
         }
         else if (file_exists($_GET['final_name']) == 0)
         {
             rename($_GET['initial_name'],$_GET['final_name']);
             echo "1";
+            die();
         }
     }
 }
