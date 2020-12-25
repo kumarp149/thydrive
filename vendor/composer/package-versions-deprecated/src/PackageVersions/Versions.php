@@ -53,7 +53,7 @@ final class Versions
   'ralouphie/getallheaders' => '3.0.3@120b605dfeb996808c31b6477290a714d356e822',
   'rize/uri-template' => '0.3.2@9e5fdd5c47147aa5adf7f760002ee591ed37b9ca',
   'symfony/polyfill-php80' => 'v1.20.0@e70aa8b064c5b72d3df2abd5ab1e90464ad009de',
-  '__root__' => 'dev-master@3e1e56603a2a20eee3ab4ca24fc6e5456c7054e6',
+  '__root__' => 'dev-develop@450c055fab139e4072b68cd85b800f73880563ea',
 );
 
     private function __construct()
