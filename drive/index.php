@@ -6,8 +6,6 @@ require $root_url.'\important\php\req_functions.php';
 
 use Google\Cloud\Storage\StorageClient;
 
-session_start();
-
 @ob_start('ob_gzhandler');
 
 clearstatcache();
@@ -45,6 +43,8 @@ if (isset($_GET['icon']))
     header('Cache-control: max-age=2592000');
     header('Expires: '.gmdate('D, d M Y H:i:s \G\M\T',time()+2592000));
     header('Content-type: image/gif');
+    //print base64_decode($I['file']); 
+    //exit;
     print base64_decode(isset($I[$e])?$I[$e]:$I['file']);
     exit;
 }
@@ -54,7 +54,7 @@ if (isset($_GET['icon']))
   header('Location: ../');
   die();
 }*/
-$_SESSION['userdir'] = 'files-784891601704400';
+$_SESSION['userdir'] = 'folder-2';
 if (! isset($_SESSION['userdir']))
 {
   unset($_SESSION['emailid']);
@@ -62,7 +62,7 @@ if (! isset($_SESSION['userdir']))
   header('Location: ../');
 }
 
-/*if (isset($_GET['id']))
+if (isset($_GET['id']))
 {
   header('Content-Type: text/html');
   $ch = curl_init();
@@ -88,15 +88,16 @@ else if (! isset($_GET['id']))
     'prefix' => $dir,
     'delimiter' => '/'
   ]);
-  $dirs_list = $files_list->prefixes();
   foreach ($files_list as $f)
   {
     $temp_files = [];
     $obj = $bucket->object($f->name());
     $info = $obj->info();
+    //echo $info['name']."<br>";
+    if ($info['name'] == $dir) continue;
     $pos = strrpos($info['id'],"/");
-    $id = substr($info['id'],$pos,16);
-    $url = "files/?id=".$id;
+    $id = substr($info['id'],$pos+1,16);
+    $url = "files/".$id;
     $temp_files['name'] = str_replace($dir,"",$f->name());  //name given
     $temp_files['url'] = $url;                              //url given
     $date = substr($info['updated'],0,10);
@@ -105,164 +106,415 @@ else if (! isset($_GET['id']))
     $temp_files['size'] = $info['size'];                    //size given
     array_push($files,$temp_files);
   }
+  $dirs_list = $files_list->prefixes();
   foreach ($dirs_list as $d)
   {
     $temp_dirs = [];
-    $obj = $bucket->object($f->name());
-    $info = $obj['info'];
-    $temp_dirs['name'] = substr($info['name'],0,strlen($info['name'])-1); //name given
-    $temp_dirs['url'] = "folders/?id=".$info['id'];      //url given
+    $obj = $bucket->object($d);
+    $info = $obj->info();
+    $temp_dirs['name'] = str_replace($dir,"",$info['name']); //name given
+    $temp_dirs['name'] = substr($temp_dirs['name'],0,strlen($temp_dirs['name'])-1);
+    $id = substr($info['id'],strlen($info['id'])-16,16);
+    $temp_dirs['url'] = "folders/".$id;      //url given
     $date = substr($info['updated'],0,10);
     $dt = new DateTime($date);
     $temp_dirs['date'] = $dt->format('m-d-Y');             //date given
     array_push($dirs,$temp_dirs);
   }
-  $files = [];
-  $dirs = [];
-}*/
-$files = [
-  0 => 
-  [
-    'url' => 'https://google.com',
-    'name' => 'first.c',
-    'date' =>  1540211788,
-    'size' => 8000
-  ],
-  1 =>
-  [
-    'url' => 'https://www.flipkart.com',
-    'name' => 'second.css',
-    'date' => 1540211788,
-    'size' => 9000
-  ],
-  2 =>
-  [
-    'url' => 'https://www.amazon.in',
-    'name' => 'files.doc',
-    'date' => 1540211761,
-    'size' => 3000
-  ],
-  3 =>
-  [
-    'url' => 'https://www.amazon.in',
-    'name' => 'files.html',
-    'date' => 1540211761,
-    'size' => 3000
-  ],
-  4 =>
-  [
-    'url' => 'https://github.com',
-    'name' => 'test.xml',
-    'date' => 1540211761,
-    'size' => 2000
-  ],
-  5 =>
-  [
-    'url' => 'https://gitlab.com',
-    'name' => 'test.py',
-    'date' => 1540211764,
-    'size' => 3000
-  ],
-  6 =>
-  [
-    'url' => 'https://gitlab.com',
-    'name' => 'test.java',
-    'date' => 1540211764,
-    'size' => 3000
-  ],
-  7 =>
-  [
-    'url' => 'https://gitlab.com',
-    'name' => 'file',
-    'date' => 1540211764,
-    'size' => 4000
-  ],
-  8 =>
-  [
-    'url' => 'https://gitlab.com',
-    'name' => 'test.cpp',
-    'date' => 1540211764,
-    'size' => 4500
-  ],
-  9 =>
-  [
-    'url' => 'https://github.com',
-    'name' => 'img1.jpg',
-    'date' => 1540211764,
-    'size' => 3900
-  ],
-  10 =>
-  [
-    'url' => 'https://youtube.com',
-    'name' => 'video1.mp4',
-    'date' => 1540211764,
-    'size' => 2400
-  ],
-  11 =>
-  [
-    'url' => 'https://twitter.com',
-    'name' => 'extract.zip',
-    'date' => 1540211764,
-    'size' => 1738302733
-  ],
-  12 =>
-  [
-    'url' => 'https://bitbucket.org',
-    'name' => 'cdn.js',
-    'date' => 1540211764,
-    'size' => 1738307
-  ],
-  13 =>
-  [
-    'url' => 'https://atlassian.com',
-    'name' => 'index.php',
-    'date' => 154211764,
-    'size' => 1738307
-  ]
-];
-$dirs = [
-  0 =>
-  [
-    'url' => 'https://microsoft.com',
-    'name' => 'firstfolder',
-    'date' =>  1540211788
-  ],
-  1 => 
-  [
-    'url' => 'https://google.com',
-    'name' => 'testfolder',
-    'date' => 1540211793
-  ]
-];
+}
+
 $date='M-d-y';
 $up_url = "";
 $dir = "";
 $end = microtime(true)-$start;
+//echo $end;
 ?>
+
 <!DOCTYPE html>
 <html>
 
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <!--<meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">-->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Drive</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/1.11.8/semantic.min.css"/>
-    <link rel="stylesheet" type="text/css" href="/semantic/dist/semantic.min.css">
-    <link rel="stylesheet" href="http://mathlearn.icu/assets/bootstrap/css/bootstrap.min.css">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i">
+    <link rel="stylesheet" href="https://s3.ap-south-1.amazonaws.com/cdn.sruteesh.icu/css/dropzone/dropzone.css">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/10.6.1/sweetalert2.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/10.6.1/sweetalert2.css">
-    <script src="http://mathlearn.icu/drive/assets/js/alerts-prompts.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="/semantic/dist/semantic.min.css">
+    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-icons/3.0.1/iconfont/material-icons.min.css">
+    <!--<link href="https://storage.googleapis.com/sruteesh-static-pages/index_main.css" rel='stylesheet'>-->
+    <script src="https://mathlearn.icu/drive/assets/js/alerts-prompts.js"></script>
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Spectral+SC:wght@600&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Patua+One&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Rufina:wght@700&display=swap" rel="stylesheet">
-    <link href="https://storage.googleapis.com/sruteesh-static-pages/index_main.css" rel='stylesheet'>
+    <link href="https://fonts.googleapis.com/css2?family=Vollkorn&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@300&family=Zilla+Slab:wght@300&display=swap" rel="stylesheet">
+    <script src="https://s3.ap-south-1.amazonaws.com/cdn.sruteesh.icu/js/dropzone/dropzone.js"></script>
+    <script src="https://code.jquery.com/jquery-2.1.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.3/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.js"></script>
+    <!--<link rel="stylesheet" href="https://unpkg.com/purecss@2.0.3/build/pure-min.css" integrity="sha384-4ZPLezkTZTsojWFhpdFembdzFudphhoOzIunR1wH6g1WQDzCAiPvDyitaK67mp0+" crossorigin="anonymous">-->
+    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/components/aes-min.js"></script>-->
+    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
+    <style type="text/css">
+    .cont 
+    {
+  display: block;
+  position: relative;
+  padding-left: 35px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  font-size: 17px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+ }
+ .cont-add 
+    {
+  display: block;
+  position: relative;
+  /*padding-left: 35px;*/
+  margin-left: -9px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  font-size: 17px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+ }
+.swal_validation
+{
+  font-family: 'Rufina', serif;
+}
+.swal2-input::selection
+{
+  background : #2196F3;
+  color: white;
+}
+.swal2-input::-moz-selection
+{
+  background: #2196F3;
+  color: white;
+}
+.delete-swal
+{
+  font-family: 'Patua One', cursive;
+}
+.arrow
+{
+  border: solid black;
+  border-width: 0 3px 3px 0;
+  display: inline-block;
+  padding: 3px;
+  position: relative;
+  top: -3px;
+  margin-left: 6px;
+}
+.copyright,.addfiles-swal
+{
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  font-weight: bold;
+}
+.down
+{
+  transform: rotate(45deg);
+  -webkit-transform: rotate(45deg);
+}
+.date
+{
+  display: none;
+}
+.up
+{
+  transform: rotate(-135deg);
+  -webkit-transform: rotate(-135deg);
+}
+/* Hide the browser's default checkbox */
+.cont input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
 
+/* Create a custom checkbox */
+.checkmark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 25px;
+  width: 25px;
+  background-color: #eee;
+}
+.swal-checkmark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 22px;
+  width: 22px;
+  background-color: #eee;
+}
+
+/* On mouse-over, add a grey background color */
+.cont:hover input ~ .checkmark {
+  background-color: #ccc;
+}
+.cont:hover input ~ .swal-checkmark {
+  background-color: #ccc;
+}
+
+/* When the checkbox is checked, add a blue background */
+.cont input:checked ~ .checkmark {
+  background-color: #2196F3;
+}
+.cont input:checked ~ .swal-checkmark {
+  background-color: #2196F3;
+}
+
+/* Create the checkmark/indicator (hidden when not checked) */
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+.swal-checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+/* Show the checkmark when checked */
+.cont input:checked ~ .checkmark:after {
+  display: block;
+}
+.cont input:checked ~ .swal-checkmark:after {
+  display: block;
+}
+
+/* Style the checkmark/indicator */
+.cont .checkmark:after {
+  left: 11px;
+  top: 7px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 3px 3px 0;
+  -webkit-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  transform: rotate(45deg);
+}
+.cont .swal-checkmark:after {
+  left: 9px;
+  top: 5px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 3px 3px 0;
+  -webkit-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  transform: rotate(45deg);
+}
+    a { cursor : pointer; }
+    #idx { border: 3px solid #fff; margin-left: 2%; margin-right: 2%; font-size: 20px; min-width: 50px;}
+    #idx td.center { text-align: center; }
+    #idx td { border-bottom: 1px solid #f0f0f0; }
+    #idx img { margin-bottom: -2px; }
+    #idx table { color: #606060; width: 100%; margin-top:3px; }
+    #idx span.link { color: #0066DF; cursor: pointer; }
+    #idx .rounded { padding: 10px 7px 10px 10px; -moz-border-radius:6px; }
+    #idx .gray { background-color:#fafafa;border-bottom: 1px solid #e5e5e5; }
+    #idx p { padding: 0px; margin: 0px;line-height:1.4em;}
+    #idx p.left { float:left;width:60%;padding:3px;color:#606060;}
+    #idx p.right {float:right;width:35%;text-align:right;color:#707070;padding:3px;}
+    #idx strong { font-family: 'Vollkorn', serif;; font-size: 1.2em; font-weight: bold; color: #202020; padding-bottom: 3px; margin: 0px; }
+    #idx a:link    { color: #0066CC; }
+    #idx a:visited { color: #0066CC; }
+    /*#idx a:hover   { text-decoration: none; }*/
+    #idx a:active  { color: #0066CC; }
+    #idx td { cursor: pointer;}
+    .filenamespan
+    {
+      white-space: nowrap;
+      overflow: hidden !important;
+      text-overflow: ellipsis;
+    }
+    .delete-icon
+    {
+      position: relative;
+      top: 4px;
+      color: blue;
+      cursor: pointer;
+      padding-right: 22px;
+      left: -4.5px;
+    }
+    .options-dropdown
+    {
+      cursor: pointer;
+    }
+    .delete
+    {
+      display : none;
+    }
+    .rename
+    {
+      display : none;
+    }
+    .filecheck
+    {
+      cursor: pointer;
+    }
+    .fileoptionsdiv
+    {
+      margin-left: 39px;
+      font-size: 18px;
+      color: #0066CC;
+    }
+
+    .delete-buttons-div
+    {
+      margin-top: 10%;
+    }
+    .navigation
+    {
+      margin-top: 100px;
+      font-size: 18px;
+    }
+    .file-icon-class
+    {
+      height: 24.8px;
+      position: relative;
+      top: -3.5px;
+    }
+    .hide1
+    {
+      display: none;
+    }
+    .hide-download
+    {
+      position: relative;
+      top: -8.5px;
+    }
+    .actions-dropdown
+    {
+        font-family: 'Vollkorn', serif;
+    }
+    @media only screen and (max-width: 571px)
+    {
+      .hide-for-mobiles
+      {
+        display : none;
+      }
+    }
+    @media only screen and (max-width: 479px)
+    {
+      .hide-download
+      {
+        display: none;
+      }
+    }
+    @media only screen and (max-width: 900px)
+    {
+        .hide1
+        {
+            display: none;
+        }
+        @media only screen and (max-width: 600px)
+        {
+            .hide2
+            {
+                display: none;
+            }
+        }
+    }
+    @media only screen and (max-width: 977px)
+    {
+        .hidedate
+        {
+            display: none;
+        }
+        @media only screen and (max-width: 834px)
+        {
+            .hidetype
+            {
+                display: none;
+            }
+        }
+    }
+    .no-items
+    {
+      font-family: 'IBM Plex Serif', serif;
+      font-size: 35px;
+      font-weight: bolder;
+      color: black;
+    }
+    .addfiles-swal
+    {
+      cursor: pointer;
+      -webkit-box-shadow:none;
+      -moz-box-shadow:none;
+      box-shadow:none;
+      background-color:#4d90fe;
+      background-image:-webkit-linear-gradient(top,#4d90fe,#4787ed);
+      background-image:-moz-linear-gradient(top,#4d90fe,#4787ed);
+      background-image:-ms-linear-gradient(top,#4d90fe,#4787ed);
+      background-image:-o-linear-gradient(top,#4d90fe,#4787ed);
+      background-image:linear-gradient(top,#4d90fe,#4787ed);
+      border:1px solid #3079ed;
+      color:#fff;
+      outline:none;
+      filter:alpha(opacity=50);
+      opacity:1;
+      border-radius: 0.13em;
+      height: 60px;
+      text-align: center;
+      padding-left: 5px;
+      padding-right: 5px;
+      padding-top: 4px;
+      padding-bottom: 4px;
+    }
+    .addfiles-swal:focus 
+    {
+      -webkit-box-shadow:inset 0 0 0 1px #fff;
+      -moz-box-shadow:inset 0 0 0 1px #fff;
+      box-shadow:inset 0 0 0 1px #fff;
+      border:1px solid #fff;
+      border:rgba(0,0,0,0) solid 1px;
+      outline:1px solid #4d90fe;
+      outline:rgba(0,0,0,0) 0
+    }
+    .addfiles-swal:active 
+    {
+ -webkit-box-shadow:inset 0 1px 2px rgba(0,0,0,0.3);
+ -moz-box-shadow:inset 0 1px 2px rgba(0,0,0,0.3);
+ box-shadow:inset 0 1px 2px rgba(0,0,0,0.3);
+ background:#357ae8;
+ border:1px solid #2f5bb7;
+ border-top:1px solid #2f5bb7
+}
+    </style>
     <script type="text/javascript">
     console.log("Script degug: Working");
+    var time_taken_for_php = "<?php echo $end; ?>";
+    console.log("Time taken: "+time_taken_for_php);
     var _c1='#fefefe'; var _c2='#fafafa'; var _ppg=100000000000000; var _cpg=1; var _files=[]; var _dirs=[]; var _tpg=null; var _tsize=0; var _sort='date'; var _sdir={'type':0,'name':0,'size':0,'date':1}; var idx=null; var tbl=null;
     function _obj(s){return document.getElementById(s);}  //returns a dom element
     function _ge(n){n=n.substr(n.lastIndexOf('.')+1);return n.toLowerCase();}   //identifies the file type
@@ -284,7 +536,7 @@ $end = microtime(true)-$start;
         console.log("_head() is executed");
         _tpg=Math.ceil((_files.length+_dirs.length)/_ppg);
         idx.innerHTML='<div class="rounded gray" style="padding:5px 10px 5px 7px;color:#202020">' +
-            '<div class="row pb-2 float-left"><label class="cont" style="margin-left: 4px"><span><input type="checkbox" class="controlling" /><span class="checkmark"></span></span></label><span><div class="ui dropdown simple" style="margin-left: 15px;"><div style="" class="text"><strong>Actions</strong></div><i class="dropdown icon" style="margin-left: 5px;"></i><div class="menu"><div class="item action-file"><i class="upload icon"></i><strong>File Upload</strong></div><div class="item action-folder"><i class="folder icon"></i><strong>New Folder</strong></div><div class="item action-delete"><i class="trash alternate icon"></i><strong>Delete</strong></div><div class="item action-move"><i class="folder open icon"></i><strong>Move to Folder</strong></div><div class="item action-rename"><i class="pen square icon"></i><strong>Rename</strong></div></div></div><?=$dir!=''?'&nbsp; (<a href="'.$up_url.'">Back</a>)':''?></span></div>' +
+            '<div class="row pb-2 float-left"><label class="cont" style="margin-left: 8.5px; margin-top: 5.5px;"><span><input type="checkbox" class="controlling" /><span class="checkmark"></span></span></label><span><div class="ui dropdown simple" style="margin-left: 15px;"><div style="" class="text ml-1 actions-dropdown"><strong>Actions</strong></div><i class="dropdown icon" style="margin-left: 5px;"></i><div class="menu"><div class="item action-file"><i class="upload icon"></i><strong>File Upload</strong></div><div class="item action-folder"><i class="folder icon"></i><strong>New Folder</strong></div><div class="item action-delete"><i class="trash alternate icon"></i><strong>Delete</strong></div><div class="item action-move"><i class="folder open icon"></i><strong>Move</strong></div><div class="item action-rename"><i class="pen square icon"></i><strong>Rename</strong></div></div></div><?=$dir!=''?'&nbsp; (<a href="'.$up_url.'">Back</a>)':''?></span></div>' +
             '<div class="float-right hide-for-mobiles" style="">' +
                 'Sort: <span class="link hidename" onmousedown="return _srt(\'name\');" id="sort_name">Name</span>  <span class="link hidetype" onmousedown="return _srt(\'type\');" id="sort_type">Type</span> <span class="link hidesize" onmousedown="return _srt(\'size\');" id="sort_size">Size</span> <span class="link hidedate" onmousedown="return _srt(\'date\');" id="sort_date">Date</span>' +
             '</div>' +
@@ -294,6 +546,14 @@ $end = microtime(true)-$start;
     }
     function _tbl()
     {
+        if (_files.length + _dirs.length == 0)
+        {
+          idx.innerHTML = "<span class='no-items' style='text-align: ml-5;'>You haven't uploaded any files. <label for='fileupload' style='cursor: pointer;'>Upload</label> to get started</span></br>";
+          idx.innerHTML += "<span class='no-items' style='text-align: ml-5;'>OR</span></br>";
+          idx.innerHTML += "<span class='no-items' style='text-align: ml-5;'>Create a New Folder</span></br>";
+          $("#idx").css("text-align","center");
+          return;
+        }
         console.log('Debug tbl: Length = '+ _files.length + _dirs.length);
         //_tpg = 1;
         var _cnt=_dirs.concat(_files);if(!tbl)return;if(_cpg>_tpg){_cpg=_tpg;return;}else if(_cpg<1){_cpg=1;return;}var a=(_cpg-1)*_ppg;var b=_cpg*_ppg;var j=0;var html='';
@@ -325,18 +585,76 @@ $end = microtime(true)-$start;
             html+='<tr class="datarow" style="background-color:'+rc+'"><td class="firsttd"><label class="cont"><span><label>&nbsp;&nbsp;&nbsp;<img class="file-icon-class" src="'+f['icon']+'" alt="" /></label><input type="checkbox" class="filecheck"><span class="checkmark"></span>&nbsp;&nbsp<a data-type="file" class="navigation" href="'+f['url']+'"><span class="filenamespan">'+f['name']+'</span></a></label></span></td><td class="hide-download"><a href="'+f['url']+'" download>Download</a></td><td class="center hide2" style="width:50px;">'+(f['dir']?'':_s(f['size']))+'</td><td class="center hide1 date" style="width:70px;">'+f['date']+'</td></tr>';
         }
         tbl.innerHTML=html+'</table>';
+        $(document).ready(function(){
+          console.log("No.of unchecked boxes: "+$(".filecheck:not(:checked)").length+$(".dircheck:not(:checked)").length)
+          $(".action-delete,.action-rename,.action-move").hide();
+          $(".controlling").click(function(){
+            $(".filecheck,.dircheck").prop('checked', $(this).prop('checked'));
+            if (_files.length + _dirs.length == 1 && $(this).prop('checked') == true)
+            {
+              $(".action-rename,.action-move,.action-delete").show();
+            }
+            if (_files.length + _dirs.length > 1 && $(this).prop('checked') == true)
+            {
+              $('.action-rename').hide();
+              $(".action-move,.action-delete").show();
+            }
+            /*if ($(this).prop('checked') == true)
+            {
+              $(".action-move,.action-delete").show();
+            }*/
+            if ($(this).prop('checked') == false)
+            {
+              $(".action-move,.action-delete").hide();
+            }
+          })
+          $(".dircheck,.filecheck").click(function(){
+            if ($(this).prop('checked') == false)
+            {
+              $(".controlling").prop('checked',$(this).prop('checked'));
+            }
+            else if ($(this).prop('checked') == true && $(".filecheck:not(:checked)").length+$(".dircheck:not(:checked)").length == 0)
+            {
+              $(".controlling").prop('checked',true);
+            }
+            if ($(this).prop('checked') == true && $(".filecheck:checked").length + $(".dircheck:checked").length == 1)
+            {
+              $(".action-rename").show();
+              $(".action-delete").show();
+              $(".action-move").show();
+            }
+            if ($(this).prop('checked') == true && $(".filecheck:checked").length + $(".dircheck:checked").length > 1)
+            {
+              $(".action-delete").show();
+              $(".action-move").show();
+              $(".action-rename").hide();
+            }
+            if ($(this).prop('checked') == false && $(".filecheck:checked").length + $(".dircheck:checked").length == 0)
+            {
+              $(".action-delete").hide();
+              $(".action-move").hide();
+              $(".action-rename").hide();
+            }
+            if ($(this).prop('checked') == false && $(".filecheck:checked").length + $(".dircheck:checked").length == 1)
+            {
+              $(".action-delete").show();
+              $(".action-move").show();
+              $(".action-rename").show();
+            }
+          })
+        })
     }
 
     
     <?php
     foreach ($dirs as $j_dir)
     {
-      print sprintf("_d('%s','%s','%s');\n",($j_dir['name']),date($date,$j_dir['date']),($j_dir['url']));
+      print sprintf("_d('%s','%s','%s');\n",($j_dir['name']),$j_dir['date'],($j_dir['url']));
       //print sprintf("_f('%s','%s','%s','%s',%d);\n",($f['name']),$f['size'],date($date,$f['date']),($f['url']),$f['date']);
     }
     foreach ($files as $j_file)
     {
-      print sprintf("_f('%s','%s','%s','%s',%d);\n",($j_file['name']),$j_file['size'],date($date,$j_file['date']),($j_file['url']),$j_file['date']);
+      print sprintf("_f('%s','%s','%s','%s',%d);\n",($j_file['name']),$j_file['size'],$j_file['date'],($j_file['url']),$j_file['date']);
     }
     ?>
 
@@ -345,14 +663,15 @@ $end = microtime(true)-$start;
         idx=_obj('idx'); _head(); _srt('name');
     };
     </script>
+    <script src="https://unpkg.com/filepond-plugin-file-validate-size/dist/filepond-plugin-file-validate-size.js"></script>
+    <script src="https://unpkg.com/filepond/dist/filepond.js"></script>
 </head>
+
 <body id="page-top">
-  <span class="contentspan">
     <div id="wrapper">
         <nav class="navbar navbar-dark align-items-start sidebar sidebar-dark accordion bg-gradient-primary p-0">
-            <div class="container-fluid d-flex flex-column p-0">
-                <a class="navbar-brand d-flex justify-content-center align-items-center sidebar-brand m-0" href="">
-                    <div class="sidebar-brand-icon rotate-n-15"><i class="fas fa-laugh-wink"></i></div>
+            <div class="container-fluid d-flex flex-column p-0"><a class="navbar-brand d-flex justify-content-center align-items-center sidebar-brand m-0" href="#">
+                    <div class="sidebar-brand-icon rotate-n-15"><i class="material-icons">insert_drive_file</i></div>
                     <div class="sidebar-brand-text mx-3"><span>THYDRIVE</span></div>
                 </a>
                 <hr class="sidebar-divider my-0">
@@ -377,7 +696,7 @@ $end = microtime(true)-$start;
                         </form>
                         <ul class="nav navbar-nav flex-nowrap ml-auto">
                             <li class="nav-item dropdown d-sm-none no-arrow"><a class="dropdown-toggle nav-link" data-toggle="dropdown" aria-expanded="false" href="#"><i class="fas fa-search"></i></a>
-                                <div class="dropdown-menu dropdown-menu-right p-3 animated--grow-in" role="menu" aria-labelledby="searchDropdown">
+                                <div class="dropdown-menu dropdown-menu-right p-3 animated--grow-in" aria-labelledby="searchDropdown">
                                     <form class="form-inline mr-auto navbar-search w-100">
                                         <div class="input-group"><input class="bg-light form-control border-0 small" type="text" placeholder="Search for ...">
                                             <div class="input-group-append"><button class="btn btn-primary py-0" type="button"><i class="fas fa-search"></i></button></div>
@@ -385,155 +704,154 @@ $end = microtime(true)-$start;
                                     </form>
                                 </div>
                             </li>
-                            <li class="nav-item dropdown no-arrow mx-1" role="presentation">
-                                <div class="nav-item dropdown no-arrow"><a class="dropdown-toggle nav-link" data-toggle="dropdown" aria-expanded="false" href="#"></a>
-                                    <div class="dropdown-menu dropdown-menu-right dropdown-list dropdown-menu-right animated--grow-in" role="menu">
-
-                                </div>
-                            </li>
-                            <li class="nav-item dropdown no-arrow mx-1" role="presentation">
-                                <div class="nav-item dropdown no-arrow"><a class="dropdown-toggle nav-link" data-toggle="dropdown" aria-expanded="false" href="#"></a>
-                                    <div class="dropdown-menu dropdown-menu-right dropdown-list dropdown-menu-right animated--grow-in" role="menu">
-
-                                        <a class="d-flex align-items-center dropdown-item" href="#">
-                                            <div class="dropdown-list-image mr-3"><img class="rounded-circle" src="http://mathlearn.icu/assets/img/avatars/avatar4.jpeg">
-                                                <div class="bg-success status-indicator"></div>
-                                            </div>
-                                            <div class="font-weight-bold">
-
-                                            </div>
-                                        </a>
-                                        <a class="d-flex align-items-center dropdown-item" href="#">
-                                            <div class="dropdown-list-image mr-3"><img class="rounded-circle" src="http://mathlearn.icu/assets/img/avatars/avatar2.jpeg">
-                                                <div class="status-indicator"></div>
-                                            </div>
-                                            <div class="font-weight-bold">
-
-                                            </div>
-                                        </a>
-                                        <a class="d-flex align-items-center dropdown-item" href="#">
-                                            <div class="dropdown-list-image mr-3"><img class="rounded-circle" src="http://mathlearn.icu/assets/img/avatars/avatar3.jpeg">
-                                                <div class="bg-warning status-indicator"></div>
-                                            </div>
-                                            <div class="font-weight-bold">
-
-                                            </div>
-                                        </a>
-                                        <a class="d-flex align-items-center dropdown-item" href="#">
-                                            <div class="dropdown-list-image mr-3"><img class="rounded-circle" src="http://mathlearn.icu/assets/img/avatars/avatar5.jpeg">
-                                                <div class="bg-success status-indicator"></div>
-                                            </div>
-                                            <div class="font-weight-bold">
-
-                                            </div>
-                                        </a></div>
-                                </div>
-                                <div class="shadow dropdown-list dropdown-menu dropdown-menu-right" aria-labelledby="alertsDropdown"></div>
-                            </li>
                             <div class="d-none d-sm-block topbar-divider"></div>
-                            <li class="nav-item dropdown no-arrow" role="presentation">
-                                <div class="nav-item dropdown no-arrow"><a class="dropdown-toggle nav-link" data-toggle="dropdown" aria-expanded="false" href="#"><span class="d-none d-lg-inline mr-2 text-gray-600 small">Valerie Luna</span><img class="border rounded-circle img-profile" src="http://mathlearn.icu/assets/img/avatars/avatar1.jpeg"></a>
-                                    <div
-                                        class="dropdown-menu shadow dropdown-menu-right animated--grow-in" role="menu"><a class="dropdown-item" role="presentation" href="#"><i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>&nbsp;Account</a><a class="dropdown-item" role="presentation" href="#"><i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>&nbsp;Settings</a>
-                                        <a
-                                            class="dropdown-item" role="presentation" href="#"><i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>&nbsp;Activity log</a>
-                                            <div class="dropdown-divider"></div><button class="dropdown-item" id="logoutbtn" role="presentation" href="#"><i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>&nbsp;Logout</button></div>
+                            <li class="nav-item dropdown no-arrow">
+                                <div class="nav-item dropdown no-arrow"><a class="dropdown-toggle nav-link" data-toggle="dropdown" aria-expanded="false" href="#"><span class="d-none d-lg-inline mr-2 text-gray-600 small">Valerie Luna</span><img class="border rounded-circle img-profile" src="assets/img/avatars/avatar1.jpeg"></a>
+                                    <div class="dropdown-menu shadow dropdown-menu-right animated--grow-in"><a class="dropdown-item" href="#"><i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>&nbsp;Account</a><a class="dropdown-item" href="#"><i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>&nbsp;Settings</a><a class="dropdown-item" href="#"><i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>&nbsp;Activity log</a>
+                                        <div class="dropdown-divider"></div><a class="dropdown-item" href="#"><i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>&nbsp;Logout</a>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
                     </div>
-                    </li>
-                    </ul>
+                </nav>
+                <div id="idx"></div>
+                <div>
+                </div>
             </div>
-            </nav>
-            <div id="idx"></div>
-        </div>
-      </span>
-        <footer class="bg-white sticky-footer">
-            <div class="container my-auto">
-                <div class="text-center my-auto copyright"><span>Copyright © ThyDrive 2020</span></div></br>
-            </div>
-        </footer>
-    </div><a class="border rounded d-inline scroll-to-top" href="#page-top"><i class="fas fa-angle-up"></i></a></div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.js"></script>
-    <script src="http://mathlearn.icu/assets/js/theme.js"></script>
+            <footer class="bg-white sticky-footer">
+                <div class="container my-auto">
+                    <div class="text-center my-auto copyright"><span>Copyright © THYDRIVE 2021</span></div>
+                </div>
+            </footer>
+        </div><a class="border rounded d-inline scroll-to-top" href="#page-top"><i class="fas fa-angle-up"></i></a>
+    </div>
     <script>
-  $(document)
-    .ready(function() {
-      $('.ui.selection.dropdown').dropdown();
-      $('.ui.dropdown').dropdown();
-      $('.ui.menu .ui.dropdown').dropdown({
-        on: 'hover'
-      });
-    })
-  ;
-  </script>
-    <script>
-      $(document).ready(function(){
-          $("#logoutbtn").click(function(){
-              $.post('http://mathlearn.icu/drive/logout.php',function(data,status){
-                  var jdata = JSON.parse(data);
-                  if (jdata.success == 1){
-                      window.location.href = "http://mathlearn.icu";
-                  }
-                  else{
-                  }
-              })
-          })
-      })
-    </script>
-    <script>
-      $(document).ready(function(){
-        $(".delete-icon").hide();
-        $("#sidebarToggleTop").click(function(){
-          $(".delete-icon").toggle();
-        })
-        $("#sidebarToggle").click(function(){
-          $(".delete-icon").toggle();
-        })
-        $("#arrow").click(function(){
-          $("#arrow").toggleClass('down up');
-        })
-      })
-    </script>
-    <script src="assets/js/fileupload.js"></script>
-    <script>
-    function upload_function()
-    {
-      var files = document.getElementById("fileupload").files;
-      //console.log(files.length);
-      var number_of_files = files.length;
-      for (i = 0; i < number_of_files; ++i)
+      function upload_function()
       {
-        //console.log(files[i].name);
-      }
-      if (number_of_files > 10)
-      {
+        files = document.getElementById("fileupload").files;
+        temp_files = Array.prototype.slice.call(files);
+        modifyshow();
+        //show += "<label class='cont'><input type='checkbox' class='swal-checbox'><span class='swal-checkmark'></span></label>"
         Swal.fire({
-          icon: 'error',
-          text: 'Choose less than 11 files'
-        });
-      }
-      else
-      {
-        if (number_of_files == 1)
-        Swal.fire({
-          icon:'success',
-          width: 600,
-          showCancelButton: true,
+          title: "Upload",
+          html : show,
           confirmButtonText: 'Upload',
-          text: number_of_files+' file is chosen'
-        });
-        else
-        Swal.fire({
-          icon: 'success',
-          width: 600,
           showCancelButton: true,
-          confirmButtonText: 'Upload',
-          text: number_of_files+' files are chosen'
-        });
+          width: '600px',
+          allowOutsideClick: false,
+          onOpen: function(){
+            if (temp_files.length > 5)
+            {
+              $(".swal2-confirm").attr("title","Maximum of 5 files can be uploaded at a time");
+              $(".swal2-confirm").prop("disabled",true);
+            }
+            else
+            {
+              var footer = "";
+            }
+          },
+          preConfirm: () => {
+            var form_data = new FormData();
+            for (i = 0; i < temp_files.length; ++i)
+            {
+              file_data = temp_files[i];
+              form_data.append("file"+i,file_data);
+            }
+            $.ajax({
+              url : 'upload.php',
+              dataType: 'text',
+              cache: false,
+              contentType: false,
+              processData: false,
+              data: form_data,
+              type: 'post',
+              success: function(result)
+              {
+                console.log(result);
+              }
+            })
+          }
+        })
       }
-    }
+      function modifyshow()
+      {
+        //console.log(files[0]);
+        if (temp_files.length == 0)
+        {
+          show = "<span style='overflow: scroll;'><span><strong>Add some files to upload</strong></span></br></br></br>";
+          show += "<span><label class='cont-add' style='text-align: left; width: 55%; white-space: nowrap; display: inline-block;'><input type='file' multiple style='display: none;' onchange='add_files_to_upload()' class='addfiles' name='addfiles' id='addfiles' /><label for='addfiles'><span class='addfiles-swal'>Add files</span></label></label></span></br></br>";
+          show += "</span></br>";
+          $(".swal2-html-container").html(show);
+          $(".swal2-confirm").prop("disabled",true);
+          $(".swal2-confirm").attr("title","No files selected to upload");
+          //console.log("Zero element array");
+          return;
+        }
+        show = "<span style='overflow: scroll;'><span><strong>Select the files you wanted to encrypt</strong></span></br></br></br>";
+        for (i = 0; i < temp_files.length; ++i)
+        {
+          if ((temp_files[i].name).length > 17 && $(window).width() >= 700)
+          {
+            temp = (temp_files[i].name).substr(0,16);
+            temp += "...";
+          }
+          else if (temp_files[i].name.length > 7 && $(window).width() < 420)
+          {
+            temp = (temp_files[i].name).substr(0,7);
+            temp += "...";
+            console.log(temp);
+          }
+          else
+          {
+            temp = temp_files[i].name;
+          }
+          show += "<span><label class='cont' style='text-align: left; width: 55%; white-space: nowrap; display: inline-block;'><input type='checkbox' class='swal-checkbox'><span class='swal-checkmark'></span><span class=''>"+temp+"</span>&nbsp;&nbsp;</label><span data-number="+i+" class='fa fa-close text-nowrap removefile' onclick='crossclick(this)' style='font-size: 20px; white-space: nowrap; display: inline-block; cursor: pointer;' data-name="+temp_files[i].name+"></span></span></br></br>"
+        }
+          if (temp_files.length > 5)
+          {
+            $(".swal2-confirm").attr("title","Maximum of 5 files can be uploaded at a time");
+            $(".swal2-confirm").prop("disabled",true);
+          }
+          else if (temp_files.length <= 5)
+          {
+            $(".swal2-confirm").prop("disabled",false);
+          }
+          show += "<span><label class='cont-add' style='text-align: left; width: 55%; white-space: nowrap; display: inline-block;'><input type='file' multiple style='display: none;' onchange='add_files_to_upload()' class='addfiles' name='addfiles' id='addfiles' /><label for='addfiles'><span class='addfiles-swal'>Add files</span></label></label></span></br></br>";
+          show += "</span></br>";
+        //show += "<span><label class='cont' style='text-align: left; width: 55%;'><span style=''><span class='addfiles-swal'>Add more</span></span></label></span></br>"
+        $(".swal2-html-container").html(show);
+        //console.log("Width: "+$(window).width());
+      }
+      function add_files_to_upload()
+      {
+        //console.log("Function to add, executed");
+        extra_files = document.getElementById("addfiles").files;
+        //console.log(extra_files);
+        extra_files_array = Array.prototype.slice.call(extra_files);
+        //console.log(extra_files_array);
+        //console.log("Extra files: ");
+        //console.log(extra_files);
+        temp_files = temp_files.concat(extra_files_array);
+        modifyshow();
+        var encryptedAES = CryptoJS.AES.encrypt("Message", "My Secret Passphrase");
+        var decryptedBytes = CryptoJS.AES.decrypt(encryptedAES, "My Secret Passphrase");
+        var plaintext = decryptedBytes.toString(CryptoJS.enc.Utf8);
+        console.log(encryptedAES+" "+decryptedBytes+" "+plaintext);
+      }
+
+      function crossclick(x)
+      {
+        var index = $(x).attr("data-number");
+        //console.log(index);
+        temp_files.splice(index,1);
+        modifyshow();
+        //console.log(temp_files);
+      }
     </script>
+    <script>
+    </script>
+    <script src="assets/js/theme.js"></script>
 </body>
 
 </html>
