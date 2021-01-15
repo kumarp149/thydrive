@@ -4,11 +4,9 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-session_start();
+include(__DIR__.'\important\php\req_functions.php');
 
-include('important/php/req_functions.php');
-
-if (valid_session() == 1)
+if (valid_session($sql_server,$sql_username,$sql_password) == 1)
 {
   header('Location: '.$domain.'/drive/files/0');
   die();
@@ -50,36 +48,28 @@ if ($_GET['domain'] != "mathlearn.icu")
 }
 
 
-if (isset($_POST['submit'])){
+if (isset($_POST['submit']))
+{
   $count = 0;
   $email = clean_mail($_POST['email']);
-  $conn = new mysqli($sql_server,$sql_username,$sql_password,'logindata');
-  $sql = "SELECT EmailId, Password, Crypt FROM logininfo";
+  $conn = new mysqli($sql_server,$sql_username,$sql_password,"logindata");
+  $sql = "SELECT email256, email512 FROM logininfo";
   $result = $conn->query($sql);
-  if ($result)
+  while ($row = $result->fetch_assoc())
   {
-    echo "Hey there";
-  }
-  if ($result->num_rows > 0)
-  {
-    while ($row = $result->fetch_assoc())
+    if (hash("sha256",$email) == $row['email256'] && hash("sha512",$email) == $row['email512'])
     {
-      if (my_decrypt($row['EmailId'],$row['Crypt']) == $email)
-      {
-        $count = 1;
-        $_SESSION['emailid'] = $email;
-        break;
-      }
+      $count = 1;
+      break;
     }
   }
   if ($count == 1)
   {
-    $conn->close();
-    unset($_SESSION['code']);
+    $_SESSION['emailid'] = $email; 
     header('Location: '.$domain.'/password.php');
     die();
   }
-  if ($count == 0)
+  else if ($count == 0)
   {
     $_SESSION['noemail'] = "No account found";
     header('Location: '.$domain.'?email&service=login&domain=mathlearn.icu&redirect_to_page=password&id='.$_SESSION['id'].'');

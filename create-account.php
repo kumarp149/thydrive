@@ -4,44 +4,15 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-include('important/php/req_functions.php');
+include(__DIR__.'\important\php\req_functions.php');
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
 
-require 'vendor/autoload.php';
+require __DIR__.'\vendor\autoload.php';
 
-session_start();
-
-function valid_session()
-{
-  if (isset($_SESSION['emailid']) && isset($_SESSION['pwdentered']))
-  {
-    $server = 'localhost';
-    $username = 'sruteeshP';
-    $password = '32175690Pq';
-    $ses_email = $_SESSION['emailid'];
-    $ses_pwd = $_SESSION['pwdentered'];
-    $conn = new mysqli($server,$username,$password,"logindata");
-    $sql = "SELECT Emailid, Password, Crypt FROM logininfo";
-    $result = $conn->query($sql);
-    while ($row = $result->fetch_assoc())
-    {
-        if (my_decrypt($row['Emailid'],$row['Crypt']) == $ses_email && my_decrypt($row['Password'],$row['Crypt']) == $ses_pwd)
-        {
-            return 1;
-        }
-    }
-    return 0;
-  }
-  else
-  {
-    return 0;
-  }
-}
-
-if (valid_session() == 1)
+if (valid_session($sql_server, $sql_username, $sql_password) == 1)
 {
   header('Location: '.$domain.'/drive/files/0');
   die();
@@ -71,25 +42,16 @@ if ($_GET['id'] != $_SESSION['id'])
 }
 
 
-if (isset($_POST['submit'])){
-  $gen_key = hash("sha256",randstring(3));
+if (isset($_POST['submit']))
+{
   $email = clean_mail($_POST['email']);
   $count = 0;
   $conn = new mysqli($sql_server,$sql_username,$sql_password,"logindata");
-  $sql = "SELECT EmailId, Crypt FROM logininfo";
+  $sql = "SELECT email256, email512 FROM logininfo";
   $result = $conn->query($sql);
-  if (! $result)
-  {
-    echo "Hey there";
-    die();
-  }
-  if ($result)
-  {
-  if ($result->num_rows > 0)
-  {
   while ($row = $result->fetch_assoc())
   {
-    if (my_decrypt($row['EmailId'],$row['Crypt']) == $email)
+    if (hash("sha256",$email) == $row['email256'] && hash("sha512",$email) == $row['email512'])
     {
       $count = 1;
       $_SESSION['firstname'] = $_POST['firstname'];
@@ -100,10 +62,9 @@ if (isset($_POST['submit'])){
       exit();
     }
   }
-  }
- }
   if ($count == 0)
   {
+    $gen_key = hash("sha256",randstring(10));
     $_SESSION['crypt'] = $gen_key;
     $_SESSION['fname_crypted'] = my_encrypt(clean_text($_POST['firstname']),$gen_key);
     $_SESSION['lname_crypted'] = my_encrypt(clean_text($_POST['lastname']),$gen_key);

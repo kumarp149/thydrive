@@ -1,8 +1,7 @@
 <?php
 session_start();
 
-include('req_functions.php');
-
+include(__DIR__.'\important\php\req_functions.php');
 
 $pwd = $_POST['query_pwd'];
 
@@ -10,7 +9,7 @@ $email = $_POST['query_emailid'];
 
 $conn = new mysqli($sql_server,$sql_username,$sql_password,'logindata');
 
-$sql = 'SELECT * FROM logininfo';
+$sql = 'SELECT email256, email512, password256, password512, crypt, userid FROM logininfo';
 
 $result = $conn->query($sql);
 
@@ -18,21 +17,19 @@ $count = 0;
 
 while ($row = $result->fetch_assoc())
 {
-  if (my_decrypt($row['EmailId'],$row['Crypt']) == $email && my_decrypt($row['Password'],$row['Crypt']) == $pwd)
+  if (hash("sha256",$email) == $row['email256'] && hash("sha512",$email) == $row['email512'] && hash("sha256",$pwd) == $row['password256'] && hash("sha512",$pwd) == $row['password512'])
   {
     $count = 1;
-    $crypt = $row['Crypt'];
-    $userkey = $row['UserKey'];
+    $_SESSION['pwdentered'] = $pwd;
+    $_SESSION['key'] = my_decrypt($row['crypt'],$email);
+    $_SESSION['uid'] = my_decrypt($row['userid'],$email);
     break;
   }
 }
 if ($count == 1)
 {
   echo json_encode(array('success' => 1));
-  $_SESSION['pwdentered'] = $pwd;
   unset($_SESSION['code']);
-  $_SESSION['userkey'] = my_decrypt($userkey,$crypt);
-  setcookie("emailid",$_SESSION['emailid'],0,"/");
 }
 else
 {

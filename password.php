@@ -6,36 +6,9 @@ error_reporting(E_ALL);
 
 session_start();
 
-include('important/php/req_functions.php');
+include(__DIR__.'\important\php\req_functions.php');
 
-function valid_session()
-{
-  if (isset($_SESSION['emailid']) && isset($_SESSION['pwdentered']))
-  {
-    $server = 'localhost';
-    $username = 'sruteeshP';
-    $password = '32175690Pq';
-    $ses_email = $_SESSION['emailid'];
-    $ses_pwd = $_SESSION['pwdentered'];
-    $conn = new mysqli($server,$username,$password,"logindata");
-    $sql = "SELECT Emailid, Password, Crypt FROM logininfo";
-    $result = $conn->query($sql);
-    while ($row = $result->fetch_assoc())
-    {
-        if (my_decrypt($row['Emailid'],$row['Crypt']) == $ses_email && my_decrypt($row['Password'],$row['Crypt']) == $ses_pwd)
-        {
-            return 1;
-        }
-    }
-    return 0;
-  }
-  else
-  {
-    return 0;
-  }
-}
-
-if (valid_session() == 1)
+if (valid_session($sql_server,$sql_username,$sql_password) == 1)
 {
   header('Location: '.$domain.'/drive/files/0');
   exit();
