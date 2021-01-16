@@ -127,9 +127,7 @@ if (! isset($_SESSION['emailid']))
            setTimeout(function()
            {
             document.getElementById("pwd-error-container").innerHTML = "Logging in....";
-             var userkey = '<?php
-             echo $_SESSION['userkey']; ?>';
-             window.location.href = "https://sruteesh.herokuapp.com/drive/files/0";
+             window.location.href = "mathlearn.icu/drive";
            },1000)
          }
          else
