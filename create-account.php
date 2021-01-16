@@ -12,6 +12,15 @@ use PHPMailer\PHPMailer\Exception;
 
 require __DIR__.'\vendor\autoload.php';
 
+if (isset($_SESSION['code_error_times']))
+{
+  unset($_SESSION['code_error_times']);
+}
+
+if (isset($_SESSION['code']) && $_SESSION['code'] == "Code Expired")
+{
+  unset($_SESSION['code']);
+}
 if (valid_session($sql_server, $sql_username, $sql_password) == 1)
 {
   header('Location: '.$domain.'/drive');
@@ -65,11 +74,13 @@ if (isset($_POST['submit']))
   {
     $_SESSION['firstname'] = clean_text($_POST['firstname']);
     $_SESSION['lastname'] = clean_text($_POST['lastname']);
+    $_SESSION['emailid'] = clean_mail($_POST['email']);
+    $_SESSION['pwdentered'] = $_POST['password'];
     //$_SESSION['gen_key'] = hash("sha256",randstring(10));
     $_SESSION['create_time'] = time();
     $_SESSION['code'] = otp_gen(6);
     $mail = new PHPMailer(true);
-    $mail->SMTPDebug = 0;                      
+    $mail->SMTPDebug = 0;      
     $mail->isSMTP();                                            
     $mail->Host       = $smtp_server;       
     $mail->SMTPAuth   = true;                                   
@@ -81,7 +92,7 @@ if (isset($_POST['submit']))
     $mail->addAddress($email, clean_text($_POST['firstname']));
     $mail->isHTML(true);
     $mail->Subject = 'Verify your account';
-    $mail->Body    = '<span style="font-size:17px;font-family:Helvetica">Hey '.$_SESSION['fname'].',</span><br><br><span style="font-size:17.5px;font-family:Helvetica">Thank you for registering for THYDRIVE. Please Confirm your account to continue</span><br><br><span style="font-size:17.5px;font-family:Helvetica">Enter the following code (valid for 15 minutes) when asked</span><br><br><div style="text-align:center"><span><b><h1>'.$code.'</h1><br><span style="font-family:Helvetica">**By Entering this code, you agree to our <a>terms and conditions</a></span></b></span></div><br><br><span style="font-size:17px;font-family:Helvetica">Alternatively, click the following button to activate your account</span><br><br><div style="text-align:center"><a href="http://buttons.cm" style="background-color:rgb(26, 115, 232);border:1px solid rgb(26, 115, 232);border-radius:3px;color:#ffffff;display:inline-block;font-family:sans-serif;font-size:16px;line-height:44px;text-align:center;text-decoration:none;width:140px;">Activate</a><br><br><span style="font-family:Helvetica"><b>**By clicking you agree to our <a>terms and comditions</b></span></div>';
+    $mail->Body    = '<span style="font-size:17px;font-family:Helvetica">Hey '.$_SESSION['firstname'].',</span><br><br><span style="font-size:17.5px;font-family:Helvetica">Thank you for registering for THYDRIVE. Please Confirm your account to continue</span><br><br><span style="font-size:17.5px;font-family:Helvetica">Enter the following code (valid for 15 minutes) when asked</span><br><br><div style="text-align:center"><span><b><h1>'.$_SESSION['code'].'</h1><br><span style="font-family:Helvetica">**By Entering this code, you agree to our <a>terms and conditions</a></span></b></span></div><br><br><span style="font-size:17px;font-family:Helvetica">Alternatively, click the following button to activate your account</span><br><br><div style="text-align:center"><a href="http://buttons.cm" style="background-color:rgb(26, 115, 232);border:1px solid rgb(26, 115, 232);border-radius:3px;color:#ffffff;display:inline-block;font-family:sans-serif;font-size:16px;line-height:44px;text-align:center;text-decoration:none;width:140px;">Activate</a><br><br><span style="font-family:Helvetica"><b>**By clicking you agree to our <a>terms and comditions</b></span></div>';
     $mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
     $mail->send();
     header("Location: confirm-account.php?verification&domain=mathlearn.icu&id=".$_SESSION['id']);

@@ -6,26 +6,27 @@ error_reporting(E_ALL);
 
 use Google\Cloud\Storage\StorageClient;
 
-include('important/php/req_functions.php');
+include(__DIR__.'\important\php\req_functions.php');
 
 require __DIR__.'\vendor\autoload.php';
 
-session_start();
-if (! isset($_SESSION['code_error_times']))
-{
-  $_SESSION['code_error_times'] = 0;
-}
 if (valid_session($sql_server,$sql_username,$sql_password) == 1)
 {
-  header('Location: '.$domain.'/drive/files/0');
+  header('Location: '.$domain.'/drive');
   die();
 }
 
 if (! isset($_SESSION['code']))
 {   
   header('Location: create-account.php');
-  exit();
+  die();
 }
+
+if (! isset($_SESSION['code_error_times']))
+{
+  $_SESSION['code_error_times'] = 0;
+}
+
 if (! isset($_GET['id']))
 {
   header("Location: confirm-account.php?verification&domain=mathlearn.icu&id=".$_SESSION['id']);
@@ -41,80 +42,42 @@ if (isset($_POST['cnfaccount']))
 {
   if (time()-$_SESSION['create_time'] > 900)
   {
-    $_SESSION['expired'] = "Code expired, redirecting to signup page";
-    unset($_SESSION['code']);
+    $_SESSION['code'] = "Code Expired";
+    $_SESSION['created'] = 0;
   }
-  if (isset($_SESSION['code']) && $_SESSION['code'] == $_POST['code'])
+  else if (isset($_SESSION['code']) && $_SESSION['code'] == $_POST['code'])
   {
-    $_SESSION['create_success'] = "Yes";
-    $fname = $_SESSION['fname_crypted'];
-    $lname = $_SESSION['lname_crypted'];
-    $email = $_SESSION['email_crypted'];
-    $password = $_SESSION['password_crypted'];
-    $crypt = $_SESSION['crypt'];
-    $user = hash("sha256",$crypt);
-    $userkey = substr(hash("sha256",$user),0,32);
-    $folder = substr(hash("sha256",randid(10)),0,10);
-    while (file_exists('drive/'.$folder))
-    {
-      $folder = substr(hash("sha256",randid(10)),0,10);
-    }
-    mkdir('drive/'.$folder); 
-
+    $_SESSION['created'] = 1;
+    $fname = $_SESSION['firstname'];
+    $lname = $_SESSION['lastname'];
+    $email = $_SESSION['emailid'];
+    $pwd256 = hash("sha256",$_SESSION['pwdentered']);
+    $pwd512 = hash("sha512",$_SESSION['pwdentered']);
+    $_SESSION['gen_key'] = hash("sha256",randstring(10));
     $conn = new mysqli($sql_server,$sql_username,$sql_password,"logindata");
-    $sql = "INSERT INTO `logininfo` (FirstName, LastName, EmailId, Password, Crypt, UserKey, foldername)
-    VALUES ('$fname', '$lname', '$email', '$password', '$crypt', '$userkey', '$folder')";
-
-    $array_insert = 
-    [
-      'firstname' => $fname,
-      'lastname' => $lname,
-      'email' => $email,
-      'password' => $password,
-      'crypt' => $crypt,
-      'userkey' => $userkey,
-      'folder' => $folder,
-      'files' => [],
-      'api_keys' => []
-    ];
-    $mongo_conn = new mongo($mongo_url);
-    $mongo_conn->insert_doc("thydrive","user_details",$array_insert);
-
-    if ($conn->query($sql) === TRUE)
-    {
-      /*$storage = new StorageClient(
-      [
-        'keyFile' => json_decode(file_get_contents('key.json'), true)
-      ]);
-      $bucket = $storage->createBucket("thydrive");*/
-      header('Location: '.$domain.'/encryption.php?encryption&id='.$_SESSION['id']);
-      die();
-    }
-    else
-    {
-      echo "Error";
-      die();
-    }
-  }
-  else if (isset($_SESSION['code']) && $_SESSION['code'] != $_POST['code'] && $_SESSION['code_error_times'] < 5)
-  {
-    $_SESSION['code_error'] = "Incorrect Code";
-    $_SESSION['code_error_times'] = $_SESSION['code_error_times'] + 1;
-    $_SESSION['show'] = "Incorrect Code";
-    header("Location: confirm-account.php?verification&domain=mathlearn.icu&id=".$_SESSION['id']);
+    $result = $conn->query("SELECT id FROM `logininfo` WHERE id = (SELECT MAX(id) FROM `logininfo`)");
+    $row = $result->fetch_assoc();
+    $lastid = $row['id'];
+    $newid = time().otp_gen(15-strlen(time())).$lastid;
+    $result = $conn->query("INSERT INTO logininfo (fname, lname, email, password256, password512, userid) VALUES ('{$fname},{$lname},{$email},{$pwd256},{$pwd512},{$newid}')");
+    header('Location: encryption.php');
     die();
   }
-
-  else if (isset($_SESSION['code']) && $_SESSION['code'] != $_POST['code'] && $_SESSION['code_error_times'] >= 5)
+  else if (isset($_SESSION['code']) && $_SESSION['code'] != $_POST['code'] && $_SESSION['code'] != "Code Expired")
   {
-    unset($_SESSION['code']);
-    $_SESSION['show'] = "Too many incorrect attempts";
-    $_SESSION['store'] = $_SESSION['show'];
+    $_SESSION['code_error_times'] = $_SESSION['code_error_times'] + 1;
   }
-  else if (! isset($_SESSION['code']))
+  else if (isset($_SESSION['code']) && $_SESSION['code'] != $_POST['code'] && $_SESSION['code'] == "Code Expired")
   {
-    $_SESSION['show'] = "Code expired";
-    $_SESSION['store'] = $_SESSION['show'];
+    $show = "Code Expired";
+  }
+  if ($_SESSION['code_error_times'] > 7)
+  {
+    $manytimes = "Too many incorrect attempts";
+  }
+  else if ($_SESSION['code_error_times'] <= 7 && $_SESSION['code'] != "Code Expired")
+  {
+    $wrongcode = "Invalid Code";
   }
 }
 
@@ -181,10 +144,6 @@ if (isset($_POST['cnfaccount']))
       <form method="post" id="code-form" autocomplete="off">
         <input type="text" class="form-control mx-auto" id="code" placeholder="Code" name="code" spellcheck="false"></input>
         <div class="container" id="code-error-container">
-          <?php
-            echo $_SESSION['show'];
-            unset($_SESSION['show']);
-          ?>
         </div>
         <div class="container" id="button-container">
           <input type="submit" class="btn btn-info" value="Confirm" name="cnfaccount" id="cnfaccount"></input>
@@ -193,15 +152,63 @@ if (isset($_POST['cnfaccount']))
     </div>
   </div>
   <script>
-    var temp = "<?php echo $_SESSION['store']; ?>";
+    var temp1 
+    = 
+    "<?php
+    if (isset($show))
+    {
+      echo $show;
+    }
+    else
+    {
+      echo "";
+    }
+    ?>";
+    var temp2 
+    = 
+    "<?php
+    if (isset($manytimes))
+    {
+      echo $manytimes;
+    }
+    else
+    {
+      echo "";
+    }
+    ?>";
+    var temp3
+    = 
+    "<?php
+    if (isset($wrongcode))
+    {
+      echo $wrongcode;
+    }
+    else
+    {
+      echo "";
+    }
+    ?>";
     $(document).ready(function(){
-      console.log(temp);
-      if (temp == "Too many incorrect attempts" || temp == "Code expired")
+      if (temp3 == "Invalid Code")
+      {
+        document.getElementById("code-error-container").innerHTML = "Code you Entered is not valid";
+      }
+      if (temp1 == "Code Expired")
       {
         $("#button-container").hide();
         $("#cnfaccount").prop('disabled', true);
+        document.getElementById("code-error-container").innerHTML = "Code has expired";
         setTimeout(function(){
-          window.location.href = "https://sruteesh.herokuapp.com";
+          window.location.href = "https://mathlearn.icu/create-account.php";
+        },1000);
+      }
+      else if (temp2 == "Too many incorrect attempts")
+      {
+        $("#button-container").hide();
+        $("#cnfaccount").prop('disabled', true);
+        document.getElementById("code-error-container").innerHTML = "Too many incorrect attempts";
+        setTimeout(function(){
+          window.location.href = "https://mathlearn.icu/create-account.php";
         },1000);
       }
       $("#code").focus();
