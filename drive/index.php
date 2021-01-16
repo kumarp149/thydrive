@@ -97,7 +97,7 @@ else if (! isset($_GET['id']))
     if ($info['name'] == $dir) continue;
     $pos = strrpos($info['id'],"/");
     $id = substr($info['id'],$pos+1,16);
-    $url = "files/".$id;
+    $url = "file/".$id;
     $temp_files['name'] = str_replace($dir,"",$f->name());  //name given
     $temp_files['url'] = $url;                              //url given
     $date = substr($info['updated'],0,10);
@@ -115,7 +115,7 @@ else if (! isset($_GET['id']))
     $temp_dirs['name'] = str_replace($dir,"",$info['name']); //name given
     $temp_dirs['name'] = substr($temp_dirs['name'],0,strlen($temp_dirs['name'])-1);
     $id = substr($info['id'],strlen($info['id'])-16,16);
-    $temp_dirs['url'] = "folders/".$id;      //url given
+    $temp_dirs['url'] = "folder/".$id;      //url given
     $date = substr($info['updated'],0,10);
     $dt = new DateTime($date);
     $temp_dirs['date'] = $dt->format('m-d-Y');             //date given
@@ -138,27 +138,24 @@ $end = microtime(true)-$start;
     <!--<meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">-->
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Drive</title>
-    <link rel="stylesheet" href="https://s3.ap-south-1.amazonaws.com/cdn.sruteesh.icu/css/dropzone/dropzone.css">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/10.6.1/sweetalert2.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/10.6.1/sweetalert2.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="/semantic/dist/semantic.min.css">
-    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="https://s3.ap-south-1.amazonaws.com/cdn.sruteesh.icu/css/sementic/semantic.min.css">
+    <link rel="stylesheet" href="https://s3.ap-south-1.amazonaws.com/cdn.sruteesh.icu/css/bootstrap/bootstrap.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-icons/3.0.1/iconfont/material-icons.min.css">
     <!--<link href="https://storage.googleapis.com/sruteesh-static-pages/index_main.css" rel='stylesheet'>-->
-    <script src="https://mathlearn.icu/drive/assets/js/alerts-prompts.js"></script>
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Spectral+SC:wght@600&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Patua+One&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Rufina:wght@700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Vollkorn&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@300&family=Zilla+Slab:wght@300&display=swap" rel="stylesheet">
-    <script src="https://s3.ap-south-1.amazonaws.com/cdn.sruteesh.icu/js/dropzone/dropzone.js"></script>
-    <script src="https://code.jquery.com/jquery-2.1.0.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.3/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.js"></script>
     <!--<link rel="stylesheet" href="https://unpkg.com/purecss@2.0.3/build/pure-min.css" integrity="sha384-4ZPLezkTZTsojWFhpdFembdzFudphhoOzIunR1wH6g1WQDzCAiPvDyitaK67mp0+" crossorigin="anonymous">-->
@@ -340,7 +337,7 @@ $end = microtime(true)-$start;
     #idx img { margin-bottom: -2px; }
     #idx table { color: #606060; width: 100%; margin-top:3px; }
     #idx span.link { color: #0066DF; cursor: pointer; }
-    #idx .rounded { padding: 10px 7px 10px 10px; -moz-border-radius:6px; }
+    #idx .rounded { padding: 10px 7px 10px 10px; border-radius:6px; }
     #idx .gray { background-color:#fafafa;border-bottom: 1px solid #e5e5e5; }
     #idx p { padding: 0px; margin: 0px;line-height:1.4em;}
     #idx p.left { float:left;width:60%;padding:3px;color:#606060;}
@@ -536,7 +533,7 @@ $end = microtime(true)-$start;
         console.log("_head() is executed");
         _tpg=Math.ceil((_files.length+_dirs.length)/_ppg);
         idx.innerHTML='<div class="rounded gray" style="padding:5px 10px 5px 7px;color:#202020">' +
-            '<div class="row pb-2 float-left"><label class="cont" style="margin-left: 8.5px; margin-top: 5.5px;"><span><input type="checkbox" class="controlling" /><span class="checkmark"></span></span></label><span><div class="ui dropdown simple" style="margin-left: 15px;"><div style="" class="text ml-1 actions-dropdown"><strong>Actions</strong></div><i class="dropdown icon" style="margin-left: 5px;"></i><div class="menu"><div class="item action-file"><i class="upload icon"></i><strong>File Upload</strong></div><div class="item action-folder"><i class="folder icon"></i><strong>New Folder</strong></div><div class="item action-delete"><i class="trash alternate icon"></i><strong>Delete</strong></div><div class="item action-move"><i class="folder open icon"></i><strong>Move</strong></div><div class="item action-rename"><i class="pen square icon"></i><strong>Rename</strong></div></div></div><?=$dir!=''?'&nbsp; (<a href="'.$up_url.'">Back</a>)':''?></span></div>' +
+            '<div class="row pb-2 float-left"><label class="cont" style="margin-left: 8.5px; margin-top: 5.5px;"><span><input type="checkbox" class="controlling" /><span class="checkmark"></span></span></label><span><div class="ui dropdown simple" style="margin-left: 15px;"><div style="" class="text ml-1 actions-dropdown"><strong>Actions</strong></div><i class="dropdown icon" style="margin-left: 5px;"></i><div class="menu"><div class="item action-file"><i class="upload icon"></i><strong><label for="fileupload" style="cursor: pointer;">File Upload</label></strong></div><div class="item action-folder"><i class="folder icon"></i><strong>New Folder</strong></div><div class="item action-delete"><i class="trash alternate icon"></i><strong>Delete</strong></div><div class="item action-move"><i class="folder open icon"></i><strong>Move</strong></div><div class="item action-rename"><i class="pen square icon"></i><strong>Rename</strong></div></div></div><?=$dir!=''?'&nbsp; (<a href="'.$up_url.'">Back</a>)':''?></span></div>' +
             '<div class="float-right hide-for-mobiles" style="">' +
                 'Sort: <span class="link hidename" onmousedown="return _srt(\'name\');" id="sort_name">Name</span>  <span class="link hidetype" onmousedown="return _srt(\'type\');" id="sort_type">Type</span> <span class="link hidesize" onmousedown="return _srt(\'size\');" id="sort_size">Size</span> <span class="link hidedate" onmousedown="return _srt(\'date\');" id="sort_date">Date</span>' +
             '</div>' +
@@ -663,8 +660,6 @@ $end = microtime(true)-$start;
         idx=_obj('idx'); _head(); _srt('name');
     };
     </script>
-    <script src="https://unpkg.com/filepond-plugin-file-validate-size/dist/filepond-plugin-file-validate-size.js"></script>
-    <script src="https://unpkg.com/filepond/dist/filepond.js"></script>
 </head>
 
 <body id="page-top">
@@ -679,6 +674,7 @@ $end = microtime(true)-$start;
                     <input class="fileupload" style="display:none" onchange="upload_function()" multiple name="fileupload" id="fileupload" type="file" />
                     <li class="nav-item upload" id="upload" role="presentation"><label for="fileupload"><a class="nav-link active upload"><i class="fas fa-upload"></i><span>Upload</span></a></li></file>
                     <li class="nav-item createfolder" role="presentation"><a class="nav-link active createfolder" href=""><i class="far fa-folder"></i><span>Create Folder</span></a></li>
+                    <li class="nav-item payments" role="presentation"><a class="nav-link active payments" href=""><i class="fas fa-folder"></i><span>Shared to You</span></a></li>
                     <li class="nav-item payments" role="presentation"><a class="nav-link active payments" href=""><i class="fas fa-money-check"></i><span>Payments</span></a></li>
                     <li class="nav-item" role="presentation"></li>
                 </ul>
@@ -753,11 +749,27 @@ $end = microtime(true)-$start;
           },
           preConfirm: () => {
             var form_data = new FormData();
+            var fr_data = new FormData();
+            enc_file = new File(["Hello there"],"hello.txt");
             for (i = 0; i < temp_files.length; ++i)
             {
+              var reader = new FileReader();
+              reader.onload = function(e)
+              {
+                var encrypted = CryptoJS.AES.encrypt(e.target.result, "32175690P");
+                console.log(encrypted+"");
+                //console.log("Name: "+e.name);
+                enc_file = new File([encrypted+""],"test.txt",{type: "text/plain", lastModified: new Date()});
+                form_data.append("file"+i,enc_file);
+                //console.log(enc_file);
+              }
+              console.log(enc_file);
+              form_data.append("file"+i,enc_file);
+              reader.readAsDataURL(temp_files[i]);
               file_data = temp_files[i];
-              form_data.append("file"+i,file_data);
+              fr_data.append("file"+i,file_data);
             }
+            console.log(fr_data);
             $.ajax({
               url : 'upload.php',
               dataType: 'text',
@@ -851,7 +863,7 @@ $end = microtime(true)-$start;
     </script>
     <script>
     </script>
-    <script src="assets/js/theme.js"></script>
+    <script src="https://storage.googleapis.com/instant-static-files/js/theme.js"></script>
 </body>
 
 </html>
