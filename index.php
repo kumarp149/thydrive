@@ -8,7 +8,7 @@ include(__DIR__.'\important\php\req_functions.php');
 
 if (valid_session($sql_server,$sql_username,$sql_password) == 1)
 {
-  header('Location: '.$domain.'/drive/files/0');
+  header('Location: '.$domain.'/drive');
   die();
 }
 
@@ -53,11 +53,11 @@ if (isset($_POST['submit']))
   $count = 0;
   $email = clean_mail($_POST['email']);
   $conn = new mysqli($sql_server,$sql_username,$sql_password,"logindata");
-  $sql = "SELECT email256, email512 FROM logininfo";
+  $sql = "SELECT email FROM logininfo";
   $result = $conn->query($sql);
   while ($row = $result->fetch_assoc())
   {
-    if (hash("sha256",$email) == $row['email256'] && hash("sha512",$email) == $row['email512'])
+    if ($email == $row['email'])
     {
       $count = 1;
       break;

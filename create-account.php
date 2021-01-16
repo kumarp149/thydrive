@@ -14,7 +14,7 @@ require __DIR__.'\vendor\autoload.php';
 
 if (valid_session($sql_server, $sql_username, $sql_password) == 1)
 {
-  header('Location: '.$domain.'/drive/files/0');
+  header('Location: '.$domain.'/drive');
   die();
 }
 
@@ -47,46 +47,27 @@ if (isset($_POST['submit']))
   $email = clean_mail($_POST['email']);
   $count = 0;
   $conn = new mysqli($sql_server,$sql_username,$sql_password,"logindata");
-  $sql = "SELECT email256, email512 FROM logininfo";
+  $sql = "SELECT email FROM logininfo";
   $result = $conn->query($sql);
   while ($row = $result->fetch_assoc())
   {
-    if (hash("sha256",$email) == $row['email256'] && hash("sha512",$email) == $row['email512'])
+    if ($email == $row['email'])
     {
       $count = 1;
       $_SESSION['firstname'] = $_POST['firstname'];
       $_SESSION['lastname'] = $_POST['lastname'];
-      $_SESSION['emailid'] = $_POST['email'];
-      $_SESSION['createerror'] = "Yes";
-      header('Location: create-account.php');
-      exit();
+      $_SESSION['createerror'] = 'Yes';
+      header('create-account.php');
+      die();
     }
   }
   if ($count == 0)
   {
-    $gen_key = hash("sha256",randstring(10));
-    $_SESSION['crypt'] = $gen_key;
-    $_SESSION['fname_crypted'] = my_encrypt(clean_text($_POST['firstname']),$gen_key);
-    $_SESSION['lname_crypted'] = my_encrypt(clean_text($_POST['lastname']),$gen_key);
-    $_SESSION['email_crypted'] = my_encrypt(clean_mail($_POST['email']),$gen_key);
-    $_SESSION['password_crypted'] = my_encrypt(clean_text($_POST['password']),$gen_key);
-
-    $_SESSION['fname'] = clean_text($_POST['firstname']);
-    $_SESSION['lname'] = clean_text($_POST['lastname']);
-    $_SESSION['email'] = clean_mail($_POST['email']);       //no use of these variables as of now
-    $_SESSION['password'] = clean_text($_POST['password']);
-
-    $fname_crypted = $_SESSION['fname_crypted'];
-    $lname_crypted = $_SESSION['lname_crypted'];
-    $email_crypted = $_SESSION['email_crypted'];
-    $password_crypted = $_SESSION['password_crypted'];
-    $sql_temp = "INSERT INTO `templogininfo` (FirstName, LastName, EmailId, Password, Crypt)
-    VALUES ('$fname_crypted','$lname_crypted','$email_crypted','$password_crypted','$gen_key')";
-    
+    $_SESSION['firstname'] = clean_text($_POST['firstname']);
+    $_SESSION['lastname'] = clean_text($_POST['lastname']);
+    //$_SESSION['gen_key'] = hash("sha256",randstring(10));
     $_SESSION['create_time'] = time();
-    $_SESSION['code_error'] = "To be seen";
-    $code = otp_gen(6);
-    $_SESSION['code'] = $code;
+    $_SESSION['code'] = otp_gen(6);
     $mail = new PHPMailer(true);
     $mail->SMTPDebug = 0;                      
     $mail->isSMTP();                                            
@@ -95,26 +76,16 @@ if (isset($_POST['submit']))
     $mail->Username   = $smtp_username;                  
     $mail->Password   = $smtp_password;                               
     $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;         
-    $mail->Port       = 587;                                    
-
-    //Recipients
-    $mail->setFrom('sruteeshkumarp@gmail.com', 'Sruteesh');
+    $mail->Port       = 587;
+    $mail->setFrom('sruteeshbulksend@gmail.com', 'Sruteesh');
     $mail->addAddress($email, clean_text($_POST['firstname']));
     $mail->isHTML(true);
     $mail->Subject = 'Verify your account';
-    $mail->Body    = '<span style="font-size:17px;font-family:Helvetica">Hey '.$_SESSION['fname'].',</span><br><br><span style="font-size:17.5px;font-family:Helvetica">It seems you have registered for Mathlearn. Please Confirm your account to continue</span><br><br><span style="font-size:17.5px;font-family:Helvetica">Enter the following code (valid for 15 minutes) when asked</span><br><br><div style="text-align:center"><span><b><h1>'.$code.'</h1><br><span style="font-family:Helvetica">**By Entering this code, you agree to our <a>terms and conditions</a></span></b></span></div><br><br><span style="font-size:17px;font-family:Helvetica">Alternatively, click the following button to activate your account</span><br><br><div style="text-align:center"><a href="http://buttons.cm" style="background-color:rgb(26, 115, 232);border:1px solid rgb(26, 115, 232);border-radius:3px;color:#ffffff;display:inline-block;font-family:sans-serif;font-size:16px;line-height:44px;text-align:center;text-decoration:none;width:140px;">Activate</a><br><br><span style="font-family:Helvetica"><b>**By clicking you agree to our <a>terms and comditions</b></span></div>';
+    $mail->Body    = '<span style="font-size:17px;font-family:Helvetica">Hey '.$_SESSION['fname'].',</span><br><br><span style="font-size:17.5px;font-family:Helvetica">Thank you for registering for THYDRIVE. Please Confirm your account to continue</span><br><br><span style="font-size:17.5px;font-family:Helvetica">Enter the following code (valid for 15 minutes) when asked</span><br><br><div style="text-align:center"><span><b><h1>'.$code.'</h1><br><span style="font-family:Helvetica">**By Entering this code, you agree to our <a>terms and conditions</a></span></b></span></div><br><br><span style="font-size:17px;font-family:Helvetica">Alternatively, click the following button to activate your account</span><br><br><div style="text-align:center"><a href="http://buttons.cm" style="background-color:rgb(26, 115, 232);border:1px solid rgb(26, 115, 232);border-radius:3px;color:#ffffff;display:inline-block;font-family:sans-serif;font-size:16px;line-height:44px;text-align:center;text-decoration:none;width:140px;">Activate</a><br><br><span style="font-family:Helvetica"><b>**By clicking you agree to our <a>terms and comditions</b></span></div>';
     $mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
-
     $mail->send();
-    if ($conn->query($sql_temp) === TRUE)
-    {
-      header("Location: confirm-account.php?verification&domain=mathlearn.icu&id=".$_SESSION['id']);
-      die();
-    }
-    else
-    {
-      echo "Data not added";
-    }
+    header("Location: confirm-account.php?verification&domain=mathlearn.icu&id=".$_SESSION['id']);
+    die();
   }
 }
 ?>
@@ -217,16 +188,14 @@ if (isset($_POST['submit']))
 </head>
 <body>
   <?php
-  if (isset($_SESSION['firstname'])){
+  if (isset($_SESSION['createerror']))
+  {
     $firstname = $_SESSION['firstname'];
-  }
-  else{
-    $firstname = '';
-  }
-  if (isset($_SESSION['lastname'])){
     $lastname = $_SESSION['lastname'];
   }
-  else{
+  else
+  {
+    $firstname = '';
     $lastname = '';
   }
   ?>
@@ -258,7 +227,7 @@ if (isset($_POST['submit']))
         if (isset($_SESSION['createerror']))
         {
           echo "<strong>**Account already exists with this Email</strong>";
-           unset($_SESSION['createerror']);
+          unset($_SESSION['createerror']);
         }?></div>
       </div>
       <div class="row mx-auto pt-4" id="formdiv">

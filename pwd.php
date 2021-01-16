@@ -9,7 +9,7 @@ $email = $_POST['query_emailid'];
 
 $conn = new mysqli($sql_server,$sql_username,$sql_password,'logindata');
 
-$sql = 'SELECT email256, email512, password256, password512, crypt, userid FROM logininfo';
+$sql = 'SELECT email, password256, password512, crypt, userid FROM logininfo';
 
 $result = $conn->query($sql);
 
@@ -17,7 +17,7 @@ $count = 0;
 
 while ($row = $result->fetch_assoc())
 {
-  if (hash("sha256",$email) == $row['email256'] && hash("sha512",$email) == $row['email512'] && hash("sha256",$pwd) == $row['password256'] && hash("sha512",$pwd) == $row['password512'])
+  if ($email == $row['email'] && hash("sha256",$pwd) == $row['password256'] && hash("sha512",$pwd) == $row['password512'])
   {
     $count = 1;
     $_SESSION['pwdentered'] = $pwd;
