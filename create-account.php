@@ -78,7 +78,7 @@ if (isset($_POST['submit']))
     $_SESSION['pwdentered'] = $_POST['password'];
     //$_SESSION['gen_key'] = hash("sha256",randstring(10));
     $_SESSION['create_time'] = time();
-    $_SESSION['code'] = otp_gen(6);
+    $_SESSION['code'] = otp_gen(8);
     $mail = new PHPMailer(true);
     $mail->SMTPDebug = 0;      
     $mail->isSMTP();                                            

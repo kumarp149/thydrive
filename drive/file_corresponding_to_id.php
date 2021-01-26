@@ -1,5 +1,5 @@
 <?php
-
+$file_location = '/var/www/gcsfuse/';
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
@@ -10,43 +10,48 @@ include('../important/php/req_functions.php');
 
 require '../vendor/autoload.php';
 
-if (valid_session($sql_server,$sql_username,$sql_password) == 0)
-{
-  header('../index.php');
-  die();
-}
+$conn = new mongo($mongo_url);
 
 if (!isset($_GET['id']) || strlen($_GET['id']) != 16)
 {
-  header('Content-Type: text/html');
-  $ch = curl_init();
-  curl_setopt($ch,CURLOPT_SSL_VERIFYPEER, false);
-  curl_setopt($ch, CURLOPT_URL, 'https://storage.googleapis.com/sruteesh-static-pages/404.html');
-  curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-  $result = curl_exec($ch);
-  if (curl_errno($ch)) 
-  {
-    echo 'Error:' . curl_error($ch);
-  }
-  curl_close($ch);
-  echo $result;
-  die();
+
 }
-
-$id = $_GET['id'];
-
-//$_SESSION['emailid'] = 'sruteeshkumarp@aol.com';
-
-$conn = new mongo($mongo_url);
-
-if ($conn->db_exist("thydrive") == 1)
+else
 {
-  if ($conn->collection_exist("thydrive","files") == 1)
+  $file_doc = $conn->fetch_doc("thydrive","files",['id' => $_GET['id']]);
+  $arr = (array) $file_doc;
+  if (sizeof($arr) == 0)
   {
-    $a = $conn->fetch_doc("thydrive","files",["id" => $id]);
-    if (in_array($_SESSION['emailid'],(array)$a['users']) == 1)
-    {
 
+  }
+  else
+  {
+    if ($arr['public'] == 1)
+    {
+      $file = pathinfo($file_location.$arr['location']); 
+      smartReadFile($file_location.$arr['location'],$file['basename'],mime_content_type($file_location.$arr['location']));
+      die();
+    }
+    else if ($arr['public'] == 0)
+    {
+      if (valid_session($sql_server,$sql_username,$sql_password) == 0)
+      {
+        if (in_array($_SESSION['emailid'],$arr['values']) == 1)
+        {
+          $file = pathinfo($file_location.$arr['location']); 
+          smartReadFile($file_location.$arr['location'],$file['basename'],mime_content_type($file_location.$arr['location']));
+          die();
+        }
+        else
+        {
+          header('../index.php');
+          die();
+        }
+      }
+      else
+      {
+
+      }
     }
   }
 }
