@@ -8,3 +8,5 @@ key1.json
 drive/test.php
 drive/test1.php
 drive/index2.php
+.gcloudignore
+app.yml
