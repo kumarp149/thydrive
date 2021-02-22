@@ -83,12 +83,12 @@ if (isset($_POST['submit']))
     $mail->SMTPDebug = 0;      
     $mail->isSMTP();                                            
     $mail->Host       = $smtp_server;       
-    $mail->SMTPAuth   = true;                                   
-    $mail->Username   = $smtp_username;                  
+    $mail->SMTPAuth   = true;                         
+    $mail->Username   = $smtp_username;             
     $mail->Password   = $smtp_password;                               
-    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;         
-    $mail->Port       = 587;
-    $mail->setFrom('sruteeshbulksend@gmail.com', 'Sruteesh');
+    $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;      
+    $mail->Port       = 465;
+    $mail->setFrom('admin@thydrive.icu', 'Sruteesh');
     $mail->addAddress($email, clean_text($_POST['firstname']));
     $mail->isHTML(true);
     $mail->Subject = 'Verify your account';
@@ -210,7 +210,7 @@ if (isset($_POST['submit']))
     $lastname = '';
   }
   ?>
-  <div class="container mt-5 pt-5" id="bigdiv">
+  <div class="container mt-3 pt-5" id="bigdiv">
     <div class="heading-text">Create your account</div>
     <button id="restrict" style="background-color:rgb(26, 115, 232);border:1px solid rgb(26, 115, 232);border-radius:3px;color:#ffffff;display:inline-block;font-family:sans-serif;font-size:16px;line-height:44px;text-align:center;text-decoration:none;width:140px;" class="mt-3">Restrictions</button><br>
     <form method="post" id="signupform" class="pt-5" autocomplete="off">
@@ -393,6 +393,7 @@ if (isset($_POST['submit']))
            else if (str.length == 0){
              document.getElementById("abbrv").className = "";
              $("#abbrv").attr("title","Captial letter, Small letter, Digit, Symbol & atleast 9 charecters with no trailing spaces");
+             $("#cnfpassword").attr("readonly",true);
            }
            else {
              $("#cnfpassword").attr("readonly",true);
@@ -524,7 +525,7 @@ if (isset($_POST['submit']))
            Swal.fire({
              //icon: 'info',
              title: '<strong>Restrictions</strong>',
-             html: '<span style="font-size: 21px">Password must have<span> </br><div style="font-size:15px"><span style="left:0px;position:relative">• Nine charecters</span></br><span style="left:-10px">• A capital letter </span></br>• A small letter </br>• A special charecter</div>'
+             html: '<span>Password must have</span></br><span>Atleast 9 charecters</span></br><span style="margin-left: -10px;">Atleast 1 digit</span>'
            })
          })
          $("#container").click(function(){

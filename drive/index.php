@@ -55,7 +55,7 @@ if (isset($_GET['icon']))
   header('Location: ../');
   die();
 }*/
-$_SESSION['userdir'] = 'folder-2';
+$_SESSION['userdir'] = 'folder-1';
 if (! isset($_SESSION['userdir']))
 {
   unset($_SESSION['emailid']);
